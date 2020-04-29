@@ -111,11 +111,12 @@
         document.execCommand('copy');
         document.body.removeChild(el);
       };
-      const TAB_LINE_REGEXP = new RegExp('^[ABCDEFGmbmajsus#7654/ ]+$')
-      const CHORD_REGEXP = new RegExp('([ABCDEFGmbmajsus#7654/]+)', 'g')
-      const NOTE_REGEXP = new RegExp('^([ABCDEFG][#♭]?)')
+      const TAB_LINE_REGEXP = new RegExp('^[ABCDEFGmbmajsusdim#97654/ ]+$')
+      const CHORD_REGEXP = new RegExp('([ABCDEFGmbmajsusdim#7654/]+)', 'g')
+      const NOTE_REGEXP = new RegExp('^([ABCDEFG][#♭b]?)')
       const notesSharp = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
       const notesFlat = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭']
+      const notesFlatAlt = ['A', 'Bb', 'B', 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab']
       const transform = (i, delta) => {
         if (typeof delta === 'string') {
           delta = parseInt(delta)
@@ -154,10 +155,13 @@
                     let n2 = n1
                     const i1 = notesSharp.indexOf(n1)
                     const i2 = notesFlat.indexOf(n1)
+                    const i3 = notesFlatAlt.indexOf(n1)
                     if (i1 > -1) {
                       n2 = notesSharp[transform(i1, this.transpose)]
                     } else if (i2 > -1) {
                       n2 = notesFlat[transform(i2, this.transpose)]
+                    } else if (i3 > -1) {
+                      n2 = notesFlatAlt[transform(i3, this.transpose)]
                     }
                     const n = m.replace(n1, n2)
                     replacements.push([m, '<b>' + n + '</b>']) 
