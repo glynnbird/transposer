@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">
+    <link rel="stylesheet" href="https://unpkg.com/vue-material/dist/vue-material.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/vue-material/dist/theme/default.css">
+    <style>
+      html, body {
+        height: 100%
+      }
+      .output {
+        font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace !important;
+        font-size:12px !important;
+      }
+      .md-textarea {
+        height: 100vh !important;
+        max-height: 100vh !important;
+        font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace !important;
+        font-size:12px !important;
+      }
+      [v-cloak] { display: none; }
+    </style>
+    <title>Transposer - Transpose guitar tabs into any key</title>
+  </head>
+
+  <body>
+    
+    <div id="app" v-cloak>
+      <template>
+        <!-- top bar -->
+        <md-toolbar class="md-accent" md-elevation="1">
+          <h3 class="md-title" style="flex: 1">Transposer</h3>
+          <div class="md-toolbar-section-end">
+            <md-field>
+              <label for="movie">Transpose</label>
+              <md-select v-model="transpose" name="transpose" id="transpose">
+                <md-option value="-11">-11</md-option>
+                <md-option value="-10">-10</md-option>
+                <md-option value="-9">-9</md-option>
+                <md-option value="-8">-8</md-option>
+                <md-option value="-7">-7</md-option>
+                <md-option value="-6">-6</md-option>
+                <md-option value="-5">-5</md-option>
+                <md-option value="-4">-4</md-option>
+                <md-option value="-3">-3</md-option>
+                <md-option value="-2">-2</md-option>
+                <md-option value="-1">-1</md-option>
+                <md-option value="0">0</md-option>
+                <md-option value="1">1</md-option>
+                <md-option value="2">2</md-option>
+                <md-option value="3">3</md-option>
+                <md-option value="4">4</md-option>
+                <md-option value="5">5</md-option>
+                <md-option value="6">6</md-option>
+                <md-option value="7">7</md-option>
+                <md-option value="8">8</md-option>
+                <md-option value="9">9</md-option>
+                <md-option value="10">10</md-option>
+                <md-option value="11">11</md-option>
+              </md-select>
+            </md-field>
+            <md-button class="md-icon-button" v-on:click="copyToClipboard">
+              <md-icon>file_copy</md-icon>
+            </md-button>
+         </div>
+        </md-toolbar>
+
+        <!-- form -->
+        <div class="md-layout md-gutter">
+          <div class="md-layout-item">
+            <md-field>
+              <label>Input</label>
+              <md-textarea v-model="input"></md-textarea>
+            </md-field>
+          </div>
+          <div class="md-layout-item">
+            <pre class="output"  v-html="output"></pre>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/vue-material"></script>
+    <script>
+      Vue.use(VueMaterial.default)
+      const multiReplace = (str, replacements) => {
+        let j
+        for(j in replacements) {
+          str = str.replace(replacements[j][0], '__TOK' + j + '__')
+        }
+        for(j in replacements) {
+          str = str.replace('__TOK' + j + '__', replacements[j][1])
+        }
+        return str
+      }
+      const cc = (str) => {
+        const el = document.createElement('textarea');
+        el.value = str;
+        el.setAttribute('readonly', '');
+        el.style.position = 'absolute';
+        el.style.left = '-9999px';
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+      };
+      const TAB_LINE_REGEXP = new RegExp('^[ABCDEFGmbmajsus#7654/ ]+$')
+      const CHORD_REGEXP = new RegExp('([ABCDEFGmbmajsus#7654/]+)', 'g')
+      const NOTE_REGEXP = new RegExp('^([ABCDEFG][#♭]?)')
+      const notesSharp = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
+      const notesFlat = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭']
+      const transform = (i, delta) => {
+        if (typeof delta === 'string') {
+          delta = parseInt(delta)
+        }
+        i = i + delta
+        if (i < 0) {
+          i += 12
+        }
+        return i % 12
+      }
+      var app = new Vue({
+        el: '#app',
+        data: {
+          input: '',
+          transpose: 0
+        },
+        methods: {
+          copyToClipboard: () => {
+            cc(app.output.replace(/<b>/mg,'').replace(/<\/b>/mg,''))
+          }
+        },
+        computed: {
+          output: function() {
+            const markdown =  this.input.split('\n').map((l) => {
+              // if this line only contains chords and spaces (not just spaces)
+              if (l.match(TAB_LINE_REGEXP) && l.trim().length !== 0) {
+                // find the chords on this line
+                const matches = l.match(CHORD_REGEXP)
+                const replacements = []
+                // console.log('matches', matches, matches.length)
+                for(var i in matches) {
+                  const m = matches[i]
+                  const note = m.match(NOTE_REGEXP)
+                  if (note) {
+                    const n1 = note[0]
+                    let n2 = n1
+                    const i1 = notesSharp.indexOf(n1)
+                    const i2 = notesFlat.indexOf(n1)
+                    if (i1 > -1) {
+                      n2 = notesSharp[transform(i1, this.transpose)]
+                    } else if (i2 > -1) {
+                      n2 = notesFlat[transform(i2, this.transpose)]
+                    }
+                    const n = m.replace(n1, n2)
+                    replacements.push([m, '<b>' + n + '</b>']) 
+                  }
+                }
+                
+                // do the replacements in one pass
+                if (replacements.length > 0) {
+                  return multiReplace(l, replacements)
+                }
+              }
+              return l
+            }).join('\n')
+            return markdown
+          }
+        }
+      })
+    </script>
+  </body>
+</html>
