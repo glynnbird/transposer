@@ -35,7 +35,14 @@
       <template>
         <!-- top bar -->
         <md-toolbar class="md-accent" md-elevation="1">
-          <h3 class="md-title" style="flex: 1" v-on:click="home">Transposer</h3>
+          <div class="md-toolbar-section-start">
+            <md-button class="md-icon-button" v-on:click="home">
+              <md-icon>music_note</md-icon>
+            </md-button>
+            <h3 class="md-title" style="flex: 1" >
+              Transposer
+            </h3>
+          </div>
           <div class="md-toolbar-section-end">
             <md-field v-if="mode === 'singletab'">
               <label for="movie">Transpose</label>
