@@ -79,7 +79,7 @@ var app = new Vue({
           if (this.sync) {
             this.sync.cancel()
           }
-          this.sync = db.sync(doc.url)
+          this.sync = db.sync(doc.url, { live: true, retry: true })
           this.sync.on('change', function(info) {
             console.log('change', info)
           })
