@@ -19,8 +19,8 @@
         font-size:12px !important;
       }
       .md-textarea {
-        height: 100vh !important;
-        max-height: 100vh !important;
+        /*height: 100vh !important;
+        max-height: 100vh !important;*/
         font-family:Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace !important;
         font-size:12px !important;
       }
@@ -35,9 +35,9 @@
       <template>
         <!-- top bar -->
         <md-toolbar class="md-accent" md-elevation="1">
-          <h3 class="md-title" style="flex: 1">Transposer</h3>
+          <h3 class="md-title" style="flex: 1" v-on:click="home">Transposer</h3>
           <div class="md-toolbar-section-end">
-            <md-field>
+            <md-field v-if="mode === 'singletab'">
               <label for="movie">Transpose</label>
               <md-select v-model="transpose" name="transpose" id="transpose">
                 <md-option value="-11">-11</md-option>
@@ -65,120 +65,141 @@
                 <md-option value="11">+11</md-option>
               </md-select>
             </md-field>
-            <md-button class="md-icon-button" v-on:click="copyToClipboard">
+            <md-button class="md-icon-button" v-if="mode === 'singletab'" v-on:click="copyToClipboard">
               <md-icon>file_copy</md-icon>
+            </md-button>
+            <md-button class="md-icon-button"  v-on:click="newTab">
+              <md-icon>add</md-icon>
             </md-button>
          </div>
         </md-toolbar>
 
-        <!-- form -->
-        <div class="md-layout md-gutter">
+        <!-- singletab -->
+        <div class="md-layout md-gutter" v-if="mode === 'singletab'">
           <div class="md-layout-item">
-            <md-field>
-              <label>Input</label>
-              <md-textarea v-model="input"></md-textarea>
-            </md-field>
-          </div>
-          <div class="md-layout-item">
-            <pre class="output"  v-html="output"></pre>
+            <md-card md-with-hover>
+              <md-ripple>
+                <md-card-header>
+                  <div class="md-title">{{ singletab.song }}</div>
+                  <div class="md-subhead">{{ singletab.artist }}</div>
+                </md-card-header>
+                <md-card-content>
+                  <div class="md-layout-item">
+                    <pre class="output"  v-html="output"></pre>
+                  </div>
+                </md-card-content>
+              </md-ripple>
+            </md-card>
           </div>
         </div>
+
+        <!-- tablist -->
+        <div class="md-layout md-gutter" v-if="mode === 'tablist'">
+          <md-empty-state v-if="tabs.length === 0" md-icon="devices_other" md-label="Create your first tab"
+            md-description="Paste in your guitar lyrics/tabs to create your first entry">
+            <md-button class="md-primary md-raised" v-on:click="newTab">Create first tab</md-button>
+          </md-empty-state>
+          <div class="md-layout-item" v-if="tabs.length > 0">
+            <md-table md-card>
+              <md-table-toolbar>
+                <h1 class="md-title">Tabs</h1>
+              </md-table-toolbar>
+              <md-table-row>
+                <md-table-head>Artist</md-table-head>
+                <md-table-head>Song</md-table-head>
+              </md-table-row>
+              <md-table-row v-for="t in tabs" :key="t._id">
+                <md-table-cell><a href="#" v-on:click="viewTab(t._id)">{{ t.artist }}</a></md-table-cell>
+                <md-table-cell><a href="#" v-on:click="viewTab(t._id)">{{ t.song }}</a></md-table-cell>
+                <md-table-cell>
+                  <md-button class="md-icon-button" v-on:click="deleteTab(t._id)">
+                    <md-icon>delete</md-icon>
+                  </md-button>
+                </md-table-cell>
+                <md-table-cell>
+                  <md-button class="md-icon-button" v-on:click="editTab(t._id)">
+                    <md-icon>edit</md-icon>
+                  </md-button>
+                </md-table-cell>
+                <md-table-cell>
+                  <md-button class="md-icon-button"  v-on:click="viewTab(t._id)">
+                    <md-icon>pageview</md-icon>
+                  </md-button>
+                </md-table-cell>
+              </md-table-row>
+            </md-table>
+          </div>
+        </div>
+
+        <!-- newtabform -->
+        <div v-if="mode === 'newtabform'">
+          <form novalidate class="md-layout">
+            <md-card class="md-layout-item">
+              <md-card-header>
+                <div class="md-title">Add Tab</div>
+              </md-card-header>
+              <md-card-content>
+                <div class="md-layout md-gutter">
+                  <div class="md-layout-item md-small-size-100">
+                    <md-field>
+                      <label>Artist</label>
+                      <md-input v-model="newtab.artist"></md-input>
+                    </md-field>
+                    <md-field>
+                      <label>Song</label>
+                      <md-input v-model="newtab.song"></md-input>
+                    </md-field>
+                    <md-field>
+                      <label>Tab</label>
+                      <md-textarea v-model="newtab.tab"></md-textarea>
+                    </md-field>
+                    <md-button class="md-raised  md-secondary" v-on:click="home">Cancel</md-button>  
+                    <md-button class="md-raised  md-primary" v-on:click="newTabSubmit">Save New Tab</md-button>  
+                  </div>
+                 </div>
+              </md-card-content>
+            </md-card>
+          </form>
+        </div>
+
+        <!-- edittabform -->
+        <div v-if="mode === 'edittabform'">
+          <form novalidate class="md-layout">
+            <md-card class="md-layout-item">
+              <md-card-header>
+                <div class="md-title">Edit Tab</div>
+              </md-card-header>
+              <md-card-content>
+                <div class="md-layout md-gutter">
+                  <div class="md-layout-item md-small-size-100">
+                    <md-field>
+                      <label>Artist</label>
+                      <md-input v-model="edittab.doc.artist"></md-input>
+                    </md-field>
+                    <md-field>
+                      <label>Song</label>
+                      <md-input v-model="edittab.doc.song"></md-input>
+                    </md-field>
+                    <md-field>
+                      <label>Tab</label>
+                      <md-textarea v-model="edittab.doc.tab"></md-textarea>
+                    </md-field>
+                    <md-button class="md-raised  md-secondary" v-on:click="home">Cancel</md-button>  
+                    <md-button class="md-raised  md-primary" v-on:click="editTabSubmit">Edit Tab</md-button>  
+                  </div>
+                 </div>
+              </md-card-content>
+            </md-card>
+          </form>
+        </div>
+
       </template>
     </div>
 
     <script src="https://unpkg.com/vue"></script>
     <script src="https://unpkg.com/vue-material"></script>
-    <script>
-      Vue.use(VueMaterial.default)
-      const multiReplace = (str, replacements) => {
-        let j
-        for(j in replacements) {
-          str = str.replace(replacements[j][0], '__TOK' + j + '__')
-        }
-        for(j in replacements) {
-          str = str.replace('__TOK' + j + '__', replacements[j][1])
-        }
-        return str
-      }
-      const cc = (str) => {
-        const el = document.createElement('textarea');
-        el.value = str;
-        el.setAttribute('readonly', '');
-        el.style.position = 'absolute';
-        el.style.left = '-9999px';
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-      };
-      const TAB_LINE_REGEXP = new RegExp('^[ABCDEFGmbmajsusdim#97654/ ]+$')
-      const CHORD_REGEXP = new RegExp('([ABCDEFGmbmajsusdim#7654/]+)', 'g')
-      const NOTE_REGEXP = new RegExp('^([ABCDEFG][#♭b]?)')
-      const notesSharp = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
-      const notesFlat = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭']
-      const notesFlatAlt = ['A', 'Bb', 'B', 'C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab']
-      const transform = (i, delta) => {
-        if (typeof delta === 'string') {
-          delta = parseInt(delta)
-        }
-        i = i + delta
-        if (i < 0) {
-          i += 12
-        }
-        return i % 12
-      }
-      var app = new Vue({
-        el: '#app',
-        data: {
-          input: '',
-          transpose: 0
-        },
-        methods: {
-          copyToClipboard: () => {
-            cc(app.output.replace(/<b>/mg,'').replace(/<\/b>/mg,''))
-          }
-        },
-        computed: {
-          output: function() {
-            const markdown =  this.input.split('\n').map((l) => {
-              // if this line only contains chords and spaces (not just spaces)
-              if (l.match(TAB_LINE_REGEXP) && l.trim().length !== 0) {
-                // find the chords on this line
-                const matches = l.match(CHORD_REGEXP)
-                const replacements = []
-                // console.log('matches', matches, matches.length)
-                for(var i in matches) {
-                  const m = matches[i]
-                  const note = m.match(NOTE_REGEXP)
-                  if (note) {
-                    const n1 = note[0]
-                    let n2 = n1
-                    const i1 = notesSharp.indexOf(n1)
-                    const i2 = notesFlat.indexOf(n1)
-                    const i3 = notesFlatAlt.indexOf(n1)
-                    if (i1 > -1) {
-                      n2 = notesSharp[transform(i1, this.transpose)]
-                    } else if (i2 > -1) {
-                      n2 = notesFlat[transform(i2, this.transpose)]
-                    } else if (i3 > -1) {
-                      n2 = notesFlatAlt[transform(i3, this.transpose)]
-                    }
-                    const n = m.replace(n1, n2)
-                    replacements.push([m, '<b>' + n + '</b>']) 
-                  }
-                }
-                
-                // do the replacements in one pass
-                if (replacements.length > 0) {
-                  return multiReplace(l, replacements)
-                }
-              }
-              return l
-            }).join('\n')
-            return markdown
-          }
-        }
-      })
-    </script>
+    <script src="//cdn.jsdelivr.net/npm/pouchdb@7.1.1/dist/pouchdb.min.js"></script>
+    <script src="js/app.js"></script>
+  
   </body>
 </html>
