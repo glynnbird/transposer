@@ -38,8 +38,8 @@ const transform = (i, delta) => {
 }
 
 // constants
-const TAB_LINE_REGEXP = new RegExp('^[ABCDEFGmbmajsusdim#97654/ ]+$')
-const CHORD_REGEXP = new RegExp('([ABCDEFGmbmajsusdim#7654]+)', 'g')
+const TAB_LINE_REGEXP = new RegExp('^[ABCDEFGmbmajsusdim#976542/ ]+$')
+const CHORD_REGEXP = new RegExp('([ABCDEFGmbmajsusdim#76542]+)', 'g')
 const NOTE_REGEXP = new RegExp('^([ABCDEFG][#♭b]?)')
 const notesSharp = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#']
 const notesFlat = ['A', 'B♭', 'B', 'C', 'D♭', 'D', 'E♭', 'E', 'F', 'G♭', 'G', 'A♭']
@@ -80,8 +80,33 @@ var app = new Vue({
             this.sync.cancel()
           }
           this.sync = db.sync(doc.url, { live: true, retry: true })
-          this.sync.on('change', function(info) {
-            console.log('change', info)
+          this.sync.on('change', function (info) {
+            console.log('change', info, info.direction)
+            if (info.direction === 'pull') {
+              console.log('direction == pull', info.change.docs.length)
+              for(var i in info.change.docs) {
+                var c = info.change.docs[i]
+                console.log('changed doc', c)
+                let found = false
+                for(var j in app.tabs) {
+                  console.log('checking',app.tabs[j])
+                  if (app.tabs[j]._id === c._id) {
+                    console.log('FOUND MATCH')
+                    if (c._deleted) {
+                      Vue.delete(app.tabs, j)
+                    } else {
+                      Vue.set(app.tabs, j, c)
+                    }
+                    found = true
+                    break
+                  }
+                }
+                if (!found) {
+                  app.tabs.push(c)
+                }
+              }
+            }
+            
           })
         }
       } catch (e) {
