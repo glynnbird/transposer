@@ -53,6 +53,8 @@ var app = new Vue({
   el: '#app',
   data: {
     mode: 'tablist',
+    url: '',
+    sync: null,
     tabs: [],
     singletab: {},
     transpose: 0,
@@ -69,6 +71,37 @@ var app = new Vue({
   methods: {
     copyToClipboard: function () {
       cc(this.output.replace(/<b>/mg,'').replace(/<\/b>/mg,''))
+    },
+    startReplication: async function() {
+      try {
+        const doc = await db.get('_local/config')
+        if (doc.url) {
+          if (this.sync) {
+            this.sync.cancel()
+          }
+          this.sync = db.sync(doc.url)
+          this.sync.on('change', function(info) {
+            console.log('change', info)
+          })
+        }
+      } catch (e) {
+        console.log('No config found')
+      }
+    },
+    settings: function() {
+      this.mode = 'settings'
+    },
+    settingsSubmit: async function() {
+      if (this.url) {
+        const obj = {
+          _id: '_local/config',
+          url: this.url
+        }
+        const response = await db.put(obj)
+        console.log(response)
+        await this.startReplication()
+      }
+      this.mode = 'tablist'
     },
     newTab: function () {
       console.log('newtab')
@@ -133,6 +166,7 @@ var app = new Vue({
     for(var i in allDocs.rows) {
       this.tabs.push(allDocs.rows[i].doc)
     }
+    this.startReplication()
   },
   computed: {
     output: function() {

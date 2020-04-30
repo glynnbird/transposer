@@ -75,6 +75,9 @@
             <md-button class="md-icon-button" v-if="mode === 'singletab'" v-on:click="copyToClipboard">
               <md-icon>file_copy</md-icon>
             </md-button>
+            <md-button class="md-icon-button"  v-on:click="settings">
+              <md-icon>settings</md-icon>
+            </md-button>
             <md-button class="md-icon-button"  v-on:click="newTab">
               <md-icon>add</md-icon>
             </md-button>
@@ -136,6 +139,35 @@
               </md-table-row>
             </md-table>
           </div>
+        </div>
+
+        <!-- settings -->
+        <div v-if="mode === 'settings'">
+          <form novalidate class="md-layout">
+            <md-card class="md-layout-item">
+              <md-card-header>
+                <div class="md-title">Settings</div>
+              </md-card-header>
+              <md-card-content>
+                <div>
+                  You may optionally sync your data with a remote Apache CouchDB
+                  or IBM Cloudant service, to ensure that the data isn't just in
+                  your browser. Enter the URL, including authentication credentials
+                  below. e.g. https://username:password@host.com/db
+                </div>
+                <div class="md-layout md-gutter">
+                  <div class="md-layout-item md-small-size-100">
+                    <md-field>
+                      <label>Remote URL</label>
+                      <md-input v-model="url" type="url"></md-input>
+                    </md-field>
+                    <md-button class="md-raised  md-secondary" v-on:click="home">Cancel</md-button>  
+                    <md-button class="md-raised  md-primary" v-on:click="settingsSubmit">Save Settings</md-button>  
+                  </div>
+                  </div>
+              </md-card-content>
+            </md-card>
+          </form>
         </div>
 
         <!-- newtabform -->
