@@ -27,6 +27,8 @@
       [v-cloak] { display: none; }
     </style>
     <title>Transposer - Transpose guitar tabs into any key</title>
+    <!-- PWA manifest -->
+    <link rel="manifest" href="manifest.json">
   </head>
 
   <body>
@@ -78,6 +80,9 @@
             <md-button class="md-icon-button"  v-on:click="settings">
               <md-icon>settings</md-icon>
             </md-button>
+            <md-button class="md-icon-button" v-if="tabs.length > 0" v-on:click="shuffle">
+              <md-icon>shuffle</md-icon>
+            </md-button>
             <md-button class="md-icon-button"  v-on:click="newTab">
               <md-icon>add</md-icon>
             </md-button>
@@ -113,25 +118,27 @@
             <md-table md-card>
               <md-table-toolbar>
                 <h1 class="md-title">Tabs</h1>
+                <form novalidate class="md-layout">
+                  <md-field  md-clearable>
+                    <label>Search</label>
+                    <md-input v-model="search"></md-input>
+                  </md-field>
+                </form>
               </md-table-toolbar>
               <md-table-row>
                 <md-table-head>Artist</md-table-head>
                 <md-table-head>Song</md-table-head>
               </md-table-row>
-              <md-table-row v-for="t in tabs" :key="t._id">
+              <md-table-row v-for="t in filteredTabs" :key="t._id">
                 <md-table-cell><a href="#" v-on:click="viewTab(t._id)">{{ t.artist }}</a></md-table-cell>
                 <md-table-cell><a href="#" v-on:click="viewTab(t._id)">{{ t.song }}</a></md-table-cell>
                 <md-table-cell>
                   <md-button class="md-icon-button" v-on:click="deleteTab(t._id)">
                     <md-icon>delete</md-icon>
                   </md-button>
-                </md-table-cell>
-                <md-table-cell>
                   <md-button class="md-icon-button" v-on:click="editTab(t._id)">
                     <md-icon>edit</md-icon>
                   </md-button>
-                </md-table-cell>
-                <md-table-cell>
                   <md-button class="md-icon-button"  v-on:click="viewTab(t._id)">
                     <md-icon>pageview</md-icon>
                   </md-button>
@@ -182,15 +189,15 @@
                   <div class="md-layout-item md-small-size-100">
                     <md-field>
                       <label>Artist</label>
-                      <md-input v-model="newtab.artist"></md-input>
+                      <md-input v-model="newtab.artist" required></md-input>
                     </md-field>
                     <md-field>
                       <label>Song</label>
-                      <md-input v-model="newtab.song"></md-input>
+                      <md-input v-model="newtab.song" required></md-input>
                     </md-field>
                     <md-field>
                       <label>Tab</label>
-                      <md-textarea v-model="newtab.tab"></md-textarea>
+                      <md-textarea v-model="newtab.tab" required></md-textarea>
                     </md-field>
                     <md-button class="md-raised  md-secondary" v-on:click="home">Cancel</md-button>  
                     <md-button class="md-raised  md-primary" v-on:click="newTabSubmit">Save New Tab</md-button>  
@@ -235,9 +242,9 @@
       </template>
     </div>
 
-    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/vue@2.6.11/dist/vue.min.js"></script>
     <script src="https://unpkg.com/vue-material"></script>
-    <script src="//cdn.jsdelivr.net/npm/pouchdb@7.1.1/dist/pouchdb.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pouchdb@7.1.1/dist/pouchdb.min.js"></script>
     <script src="js/app.js"></script>
   
   </body>

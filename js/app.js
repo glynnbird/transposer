@@ -66,7 +66,8 @@ var app = new Vue({
     edittab: {
       doc: {},
       i: 0
-    }
+    },
+    search: ''
   },
   methods: {
     copyToClipboard: function () {
@@ -76,22 +77,18 @@ var app = new Vue({
       try {
         const doc = await db.get('_local/config')
         if (doc.url) {
+          this.url = doc.url
           if (this.sync) {
             this.sync.cancel()
           }
           this.sync = db.sync(doc.url, { live: true, retry: true })
           this.sync.on('change', function (info) {
-            console.log('change', info, info.direction)
             if (info.direction === 'pull') {
-              console.log('direction == pull', info.change.docs.length)
               for(var i in info.change.docs) {
                 var c = info.change.docs[i]
-                console.log('changed doc', c)
                 let found = false
                 for(var j in app.tabs) {
-                  console.log('checking',app.tabs[j])
                   if (app.tabs[j]._id === c._id) {
-                    console.log('FOUND MATCH')
                     if (c._deleted) {
                       Vue.delete(app.tabs, j)
                     } else {
@@ -116,6 +113,12 @@ var app = new Vue({
     settings: function() {
       this.mode = 'settings'
     },
+    shuffle: function() {
+      if (this.tabs.length > 0) {
+        const i = Math.floor(Math.random() * this.tabs.length)
+        this.viewTab(this.tabs[i]._id)
+      }
+    },
     settingsSubmit: async function() {
       if (this.url) {
         const obj = {
@@ -123,28 +126,26 @@ var app = new Vue({
           url: this.url
         }
         const response = await db.put(obj)
-        console.log(response)
         await this.startReplication()
       }
       this.mode = 'tablist'
     },
     newTab: function () {
-      console.log('newtab')
       this.newtab.artist = ''
       this.newtab.song = ''
       this.newtab.tab = ''
       this.mode = 'newtabform'
     },
     newTabSubmit: async function () {
-      console.log('submit', this.newtab)
-      const response = await db.post(this.newtab)
-      console.log(response)
-      const obj = {}
-      Object.assign(obj, this.newtab)
-      obj._id = response.id
-      obj._rev = response.rev
-      this.tabs.push(obj)
-      this.mode = 'tablist'
+      if (newtab.song && newtab.artist && newtab.tab) {
+        const response = await db.post(this.newtab)
+        const obj = {}
+        Object.assign(obj, this.newtab)
+        obj._id = response.id
+        obj._rev = response.rev
+        this.tabs.push(obj)
+        this.mode = 'tablist'
+      }
     },
     home: function () {
       this.mode = 'tablist'
@@ -185,15 +186,39 @@ var app = new Vue({
     }
   },
   mounted: async function () {
-    console.log('mounted - loading all tabs')
     const allDocs = await db.allDocs({ include_docs: true })
-    console.log(allDocs)
     for(var i in allDocs.rows) {
       this.tabs.push(allDocs.rows[i].doc)
     }
     this.startReplication()
   },
   computed: {
+    filteredTabs: function() {
+      let retval = []
+      if (this.search.trim() === '') {
+        retval = this.tabs
+      } else {
+        const s = this.search.toLowerCase().trim()
+        for(var i in this.tabs) {
+          const t = this.tabs[i]
+          if (t.artist.toLowerCase().includes(s) || t.song.toLowerCase().includes(s)) {
+            retval.push(t)
+          }
+        }
+      }
+      const sorter = function(a,b) {
+        const A = a.artist.toLowerCase().replace(/^the /,'')+a.song.toLowerCase()
+        const B = b.artist.toLowerCase().replace(/^the /,'')+b.song.toLowerCase()
+        if (A < B) {
+          return -1
+        } else if (A === B) {
+          return 0
+        } else {
+          return 1
+        }
+      }
+      return retval.sort(sorter)
+    },
     output: function() {
       if (!this.singletab && !this.singletab.tab) {
         return ''
@@ -204,7 +229,6 @@ var app = new Vue({
           // find the chords on this line
           const matches = l.match(CHORD_REGEXP)
           const replacements = []
-          console.log('matches', matches, matches.length)
           for(var i in matches) {
             const m = matches[i]
             const note = m.match(NOTE_REGEXP)
