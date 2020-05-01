@@ -125,26 +125,22 @@
                   </md-field>
                 </form>
               </md-table-toolbar>
-              <md-table-row>
-                <md-table-head>Artist</md-table-head>
-                <md-table-head>Song</md-table-head>
-              </md-table-row>
-              <md-table-row v-for="t in filteredTabs" :key="t._id">
-                <md-table-cell><a href="#" v-on:click="viewTab(t._id)">{{ t.artist }}</a></md-table-cell>
-                <md-table-cell><a href="#" v-on:click="viewTab(t._id)">{{ t.song }}</a></md-table-cell>
-                <md-table-cell>
-                  <md-button class="md-icon-button" v-on:click="deleteTab(t._id)">
-                    <md-icon>delete</md-icon>
-                  </md-button>
-                  <md-button class="md-icon-button" v-on:click="editTab(t._id)">
-                    <md-icon>edit</md-icon>
-                  </md-button>
-                  <md-button class="md-icon-button"  v-on:click="viewTab(t._id)">
-                    <md-icon>pageview</md-icon>
-                  </md-button>
-                </md-table-cell>
-              </md-table-row>
             </md-table>
+            <md-card v-for="t in filteredTabs" :key="t._id">
+              <md-card-header>
+                <div class="md-title"><a href="#" v-on:click="viewTab(t._id)">{{ t.song }}</a></div>
+                <div class="md-subhead">{{ t.artist}}</div>
+              </md-card-header>
+              
+              <md-card-content>
+                {{ t.tab.substr(0,200) + '...'}}
+              </md-card-content>
+        
+              <md-card-actions>
+                <md-button class="md-icon-button" v-on:click="editTab(t._id)">Edit</md-button>
+                <md-button class="md-icon-button"  v-on:click="viewTab(t._id)">View</md-button>
+              </md-card-actions>
+            </md-card>
           </div>
         </div>
 
@@ -230,6 +226,7 @@
                       <label>Tab</label>
                       <md-textarea v-model="edittab.doc.tab"></md-textarea>
                     </md-field>
+                    <md-button class="md-raised  md-accent" v-on:click="deleteTab(edittab.doc._id)">Delete</md-button>
                     <md-button class="md-raised  md-secondary" v-on:click="home">Cancel</md-button>  
                     <md-button class="md-raised  md-primary" v-on:click="editTabSubmit">Edit Tab</md-button>  
                   </div>
