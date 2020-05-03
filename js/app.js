@@ -137,7 +137,7 @@ var app = new Vue({
       this.mode = 'newtabform'
     },
     newTabSubmit: async function () {
-      if (newtab.song && newtab.artist && newtab.tab) {
+      if (this.newtab.song && this.newtab.artist && this.newtab.tab) {
         const response = await db.post(this.newtab)
         const obj = {}
         Object.assign(obj, this.newtab)
@@ -155,6 +155,7 @@ var app = new Vue({
         if (this.tabs[i]._id === id) {
           await db.remove(id, this.tabs[i]._rev)
           Vue.delete(this.tabs, i)
+          this.mode = 'tablist'
           break
         }
       }
