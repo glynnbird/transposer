@@ -121,7 +121,8 @@
                 <form novalidate class="md-layout">
                   <md-field  md-clearable>
                     <label>Search</label>
-                    <md-input v-model="search"></md-input>
+                    <!-- using :value & @input because v-model doesn't work on Chrome mobile -->
+                    <md-input :value='search' @input='(s)=>{search = s}' @keypress.enter.prevent></md-input>
                   </md-field>
                 </form>
               </md-table-toolbar>
