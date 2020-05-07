@@ -118,12 +118,12 @@
             <md-table md-card>
               <md-table-toolbar>
                 <h1 class="md-title">Tabs</h1>
-                <form novalidate class="md-layout">
+                <div class="md-layout">
                   <md-field  md-clearable>
                     <label>Search</label>
-                    <md-input v-model="search" @keypress.enter.prevent></md-input>
+                    <md-input v-model="search"></md-input>
                   </md-field>
-                </form>
+                </div>
               </md-table-toolbar>
             </md-table>
             <md-card v-for="t in filteredTabs" :key="t._id">
