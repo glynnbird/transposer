@@ -81,7 +81,7 @@ var app = new Vue({
           if (this.sync) {
             this.sync.cancel()
           }
-          this.sync = db.sync(doc.url, { live: true, retry: true })
+          this.sync = db.sync(doc.url)
           this.sync.on('change', function (info) {
             if (info.direction === 'pull') {
               for(var i in info.change.docs) {
@@ -100,10 +100,10 @@ var app = new Vue({
                 }
                 if (!found) {
                   app.tabs.push(c)
+                  this.mode = 'tablist'
                 }
               }
             }
-            
           })
         }
       } catch (e) {
@@ -208,6 +208,9 @@ var app = new Vue({
         }
       }
       const sorter = function(a,b) {
+        if (!a.artist || !b.artist) {
+          return 0
+        }
         const A = a.artist.toLowerCase().replace(/^the /,'')+a.song.toLowerCase()
         const B = b.artist.toLowerCase().replace(/^the /,'')+b.song.toLowerCase()
         if (A < B) {
