@@ -72,6 +72,10 @@ var app = new Vue({
     shufflePos: 0
   },
   methods: {
+    quickSearch: function (str) {
+      this.search = str
+      this.mode = 'tablist'
+    },
     copyToClipboard: function () {
       cc(this.output.replace(/<b>/mg, '').replace(/<\/b>/mg, ''))
     },
@@ -217,6 +221,16 @@ var app = new Vue({
     this.startReplication()
   },
   computed: {
+    artistList: function () {
+      let retval = []
+      for (var i in this.tabs) {
+        const t = this.tabs[i]
+        if (t.artist && !retval.includes(t.artist)) {
+          retval.push(t.artist)
+        }
+      }
+      return retval.sort()
+    },
     filteredTabs: function () {
       let retval = []
       if (!this.search || this.search.trim() === '') {

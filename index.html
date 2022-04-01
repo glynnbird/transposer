@@ -63,7 +63,12 @@
         </div>
         <v-card v-if="mode === 'singletab'">
           <v-card-title>{{ singletab.song }}</v-card-title>
-          <v-card-subtitle>{{ singletab.artist }}</v-card-subtitle>
+          <v-card-subtitle>
+            {{ singletab.artist }}
+            <v-btn icon x-small @click="quickSearch(singletab.artist)">
+              <v-icon>mdi-account-search</v-icon>
+            </v-btn>
+          </v-card-subtitle>
           <v-card-text>
             <pre class="output" v-html="output"></pre>
           </v-card-text>
@@ -76,26 +81,43 @@
 
         <!-- tab list -->
         <v-text-field v-if="mode === 'tablist'" clearable v-model="search" label="Search"></v-text-field>
-        <v-list v-if="mode === 'tablist'">
-          <!-- if there are no tabs -->
-          <v-list-item v-if="tabs.length === 0">
-            <v-list-item-content>
-              <v-list-item-title>Create your first tab</v-list-item-title>
-            </v-list-item-content>
-            <v-btn @click="newTab">
-              Create first tab
-            </v-btn>
-          </v-list-item>
+        <v-row v-if="mode === 'tablist'">
+          <v-col>
+            <v-list>
+              <!-- if there are no tabs -->
+              <v-list-item v-if="tabs.length === 0">
+                <v-list-item-content>
+                  <v-list-item-title>Create your first tab</v-list-item-title>
+                </v-list-item-content>
+                <v-btn @click="newTab">
+                  Create first tab
+                </v-btn>
+              </v-list-item>
 
-          <!-- one list item per tab -->
-          <v-list-item v-for="t in filteredTabs" :key="t._id" @click="viewTab(t._id)">
-            <v-list-item-content>
-              <v-list-item-title>{{ t.song }}</v-list-item-title>
-              <v-list-item-subtitle>{{ t.artist }}</v-list-item-subtitle>
-              <div class="lyricssmall">{{ t.tab.substr(0,200) + '...'}}</div>
-            </v-list-item-content>
-          </v-list-item>
-        </v-list>
+              <!-- one list item per tab -->
+              <h3>Songs</h3>
+              <v-list-item v-for="t in filteredTabs" :key="t._id" @click="viewTab(t._id)">
+                <v-list-item-content>
+                  <v-list-item-title>{{ t.song }}</v-list-item-title>
+                  <v-list-item-subtitle>{{ t.artist }}</v-list-item-subtitle>
+                  <div class="lyricssmall">{{ t.tab.substr(0,200) + '...'}}</div>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+          </v-col>
+          <v-col>
+            <!-- artist list -->
+            <h3>Artists</h3>
+            <v-list dense>
+              <v-list-item-group>
+                <v-list-item v-for="artist in artistList" :key="artist">
+                  <v-list-item-content @click="quickSearch(artist)">{{ artist }}</v-list-item-content>
+                </v-list-item>
+              </v-list-item-group>
+            </v-list>
+          </v-col>
+        </v-row>
+
 
         <!-- new tab form -->
         <v-form v-if="mode=== 'newtabform'">
