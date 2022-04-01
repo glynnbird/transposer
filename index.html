@@ -3,31 +3,25 @@
 
 <head>
   <meta charset="utf-8">
-  <meta content="width=device-width,initial-scale=1,minimal-ui" name="viewport">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic|Material+Icons">
-  <link rel="stylesheet" href="https://unpkg.com/vue-material/dist/vue-material.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/vue-material/dist/theme/default.css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
   <style>
-    html,
-    body {
-      height: 100%
-    }
-
-    .md-toolbar {
-      position: sticky !important;
-      top: 1px !important;
-    }
-
     .output {
       font-family: Consolas, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace !important;
       font-size: 12px !important;
     }
 
-    .md-textarea {
+    textarea {
       /*height: 100vh !important;
         max-height: 100vh !important;*/
       font-family: Consolas, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace !important;
       font-size: 12px !important;
+    }
+
+    .lyricssmall {
+      font-size: 10px
     }
 
     [v-cloak] {
@@ -40,215 +34,106 @@
 </head>
 
 <body>
-
-  <div id="app" v-cloak>
-    <template>
-      <!-- top bar -->
-      <md-toolbar class="md-accent" md-elevation="1">
-        <div class="md-toolbar-section-start">
-          <md-button class="md-icon-button" v-on:click="home">
-            <md-icon>music_note</md-icon>
-          </md-button>
-          <h3 class="md-title" style="flex: 1">
-            Transposer
-          </h3>
+  <v-app id="app" v-cloak>
+    <v-main>
+      <v-app-bar dark>
+        <v-toolbar-title @click="home">Transposer</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon @click="settings">
+          <v-icon>mdi-sync</v-icon>
+        </v-btn>
+        <v-btn icon @click="shuffle">
+          <v-icon>mdi-shuffle</v-icon>
+        </v-btn>
+        <v-btn icon @click="newTab">
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+      </v-app-bar>
+      <v-container fluid>
+        <!-- single tab-->
+        <div v-if="mode === 'singletab'">
+          <v-select :items="transposeItems" v-model="transpose" label="Transpose"></v-select>
         </div>
-        <div class="md-toolbar-section-end">
-          <md-field v-if="mode === 'singletab'">
-            <label for="movie">Transpose</label>
-            <md-select v-model="transpose" name="transpose" id="transpose">
-              <md-option value="-11">-11</md-option>
-              <md-option value="-10">-10</md-option>
-              <md-option value="-9">-9</md-option>
-              <md-option value="-8">-8</md-option>
-              <md-option value="-7">-7</md-option>
-              <md-option value="-6">-6</md-option>
-              <md-option value="-5">-5</md-option>
-              <md-option value="-4">-4</md-option>
-              <md-option value="-3">-3</md-option>
-              <md-option value="-2">-2</md-option>
-              <md-option value="-1">-1</md-option>
-              <md-option value="0">0</md-option>
-              <md-option value="1">+1</md-option>
-              <md-option value="2">+2</md-option>
-              <md-option value="3">+3</md-option>
-              <md-option value="4">+4</md-option>
-              <md-option value="5">+5</md-option>
-              <md-option value="6">+6</md-option>
-              <md-option value="7">+7</md-option>
-              <md-option value="8">+8</md-option>
-              <md-option value="9">+9</md-option>
-              <md-option value="10">+10</md-option>
-              <md-option value="11">+11</md-option>
-            </md-select>
-          </md-field>
-          <md-button class="md-icon-button" v-if="mode === 'singletab'" v-on:click="copyToClipboard">
-            <md-icon>file_copy</md-icon>
-          </md-button>
-          <md-button class="md-icon-button" v-on:click="settings">
-            <md-icon>settings</md-icon>
-          </md-button>
-          <md-button class="md-icon-button" v-if="tabs.length > 0" v-on:click="shuffle">
-            <md-icon>shuffle</md-icon>
-          </md-button>
-          <md-button class="md-icon-button" v-on:click="newTab">
-            <md-icon>add</md-icon>
-          </md-button>
-        </div>
-      </md-toolbar>
+        <v-card v-if="mode === 'singletab'">
+          <v-card-title>{{ singletab.song }}</v-card-title>
+          <v-card-subtitle>{{ singletab.artist }}</v-card-subtitle>
+          <v-card-text>
+            <pre class="output" v-html="output"></pre>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn icon @click="editTab(singletab._id)">
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+          </v-card-actions>
+        </v-card>
 
-      <!-- singletab -->
-      <div class="md-layout md-gutter" v-if="mode === 'singletab'">
-        <div class="md-layout-item">
-          <md-card md-with-hover>
-            <md-ripple>
-              <md-card-header>
-                <div class="md-title">{{ singletab.song }}</div>
-                <div class="md-subhead">{{ singletab.artist }}</div>
-              </md-card-header>
-              <md-card-content>
-                <div class="md-layout-item">
-                  <pre class="output" v-html="output"></pre>
-                </div>
-              </md-card-content>
-            </md-ripple>
-          </md-card>
-        </div>
-      </div>
+        <!-- tab list -->
+        <v-text-field v-if="mode === 'tablist'" v-model="search" label="Search"></v-text-field>
+        <v-list v-if="mode === 'tablist'">
+          <!-- if there are no tabs -->
+          <v-list-item v-if="tabs.length === 0">
+            <v-list-item-content>
+              <v-list-item-title>Create your first tab</v-list-item-title>
+            </v-list-item-content>
+            <v-btn @click="newTab">
+              Create first tab
+            </v-btn>
+          </v-list-item>
 
-      <!-- tablist -->
-      <div class="md-layout md-gutter" v-if="mode === 'tablist'">
-        <md-empty-state v-if="tabs.length === 0" md-icon="devices_other" md-label="Create your first tab"
-          md-description="Paste in your guitar lyrics/tabs to create your first entry">
-          <md-button class="md-primary md-raised" v-on:click="newTab">Create first tab</md-button>
-        </md-empty-state>
-        <div class="md-layout-item" v-if="tabs.length > 0">
-          <md-table md-card>
-            <md-table-toolbar>
-              <h1 class="md-title">Tabs</h1>
-              <div class="md-layout">
-                <md-field md-clearable>
-                  <label>Search</label>
-                  <md-input v-model="search"></md-input>
-                </md-field>
-              </div>
-            </md-table-toolbar>
-          </md-table>
-          <md-card v-for="t in filteredTabs" :key="t._id">
-            <md-card-header>
-              <div class="md-title"><a href="#" v-on:click="viewTab(t._id)">{{ t.song }}</a></div>
-              <div class="md-subhead">{{ t.artist}}</div>
-            </md-card-header>
+          <!-- one list item per tab -->
+          <v-list-item v-for="t in filteredTabs" :key="t._id" @click="viewTab(t._id)">
+            <v-list-item-content>
+              <v-list-item-title>{{ t.song }}</v-list-item-title>
+              <v-list-item-subtitle>{{ t.artist }}</v-list-item-subtitle>
+              <div class="lyricssmall">{{ t.tab.substr(0,200) + '...'}}</div>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
 
-            <md-card-content v-if="t.tab">
-              {{ t.tab.substr(0,200) + '...'}}
-            </md-card-content>
+        <!-- new tab form -->
+        <v-form v-if="mode=== 'newtabform'">
+          <h2>Add Tab</h2>
+          <v-text-field v-model="newtab.artist" label="Artist" required></v-text-field>
+          <v-text-field v-model="newtab.song" label="Song" required></v-text-field>
+          <v-textarea v-model="newtab.tab" label="Tab" required></v-textarea>
+          <v-btn color="error" class="mr-4" @click="home">Cancel</v-btn>
+          <v-btn :disabled="!newtab.artist || !newtab.song" color="success" class="mr-4" @click="newTabSubmit">Save New
+            Tab</v-btn>
+        </v-form>
 
-            <md-card-actions>
-              <md-button class="md-icon-button" v-on:click="editTab(t._id)">Edit</md-button>
-              <md-button class="md-icon-button" v-on:click="viewTab(t._id)">View</md-button>
-            </md-card-actions>
-          </md-card>
-        </div>
-      </div>
+        <!-- edit tab form-->
+        <v-form v-if="mode=== 'edittabform'">
+          <h2>Edit Tab</h2>
+          <v-text-field v-model="edittab.doc.artist" label="Artist" required></v-text-field>
+          <v-text-field v-model="edittab.doc.song" label="Song" required></v-text-field>
+          <v-textarea v-model="edittab.doc.tab" label="Tab" required></v-textarea>
+          <v-btn color="warning" class="mr-4" @click="deleteTab(edittab.doc._id)">Delete</v-btn>
+          <v-btn color="error" class="mr-4" @click="home">Cancel</v-btn>
+          <v-btn :disabled="!edittab.doc.artist || !edittab.doc.song" color="success" class="mr-4"
+            @click="editTabSubmit">Edit Tab
+          </v-btn>
+        </v-form>
 
-      <!-- settings -->
-      <div v-if="mode === 'settings'">
-        <form novalidate class="md-layout">
-          <md-card class="md-layout-item">
-            <md-card-header>
-              <div class="md-title">Settings</div>
-            </md-card-header>
-            <md-card-content>
-              <div>
-                You may optionally sync your data with a remote Apache CouchDB
-                or IBM Cloudant service, to ensure that the data isn't just in
-                your browser. Enter the URL, including authentication credentials
-                below. e.g. https://username:password@host.com/db
-              </div>
-              <div class="md-layout md-gutter">
-                <div class="md-layout-item md-small-size-100">
-                  <md-field>
-                    <label>Remote URL</label>
-                    <md-input v-model="url" type="url"></md-input>
-                  </md-field>
-                  <md-button class="md-raised  md-secondary" v-on:click="home">Cancel</md-button>
-                  <md-button class="md-raised  md-primary" v-on:click="settingsSubmit">Save Settings</md-button>
-                </div>
-              </div>
-            </md-card-content>
-          </md-card>
-        </form>
-      </div>
+        <!-- settings form -->
+        <v-form v-if="mode === 'settings'">
+          <h2>Sync Settings</h2>
+          <div>
+            You may optionally sync your data with a remote Apache CouchDB
+            or IBM Cloudant service, to ensure that the data isn't just in
+            your browser. Enter the URL, including authentication credentials
+            below. e.g. https://username:password@host.com/db
+          </div>
+          <v-text-field v-model="url" label="URL" required></v-text-field>
+          <v-btn color="error" class="mr-4" @click="home">Cancel</v-btn>
+          <v-btn :disabled="!url" color="success" class="mr-4" @click="settingsSubmit">Save Settings</v-btn>
+        </v-form>
 
-      <!-- newtabform -->
-      <div v-if="mode === 'newtabform'">
-        <form novalidate class="md-layout">
-          <md-card class="md-layout-item">
-            <md-card-header>
-              <div class="md-title">Add Tab</div>
-            </md-card-header>
-            <md-card-content>
-              <div class="md-layout md-gutter">
-                <div class="md-layout-item md-small-size-100">
-                  <md-field>
-                    <label>Artist</label>
-                    <md-input v-model="newtab.artist" required></md-input>
-                  </md-field>
-                  <md-field>
-                    <label>Song</label>
-                    <md-input v-model="newtab.song" required></md-input>
-                  </md-field>
-                  <md-field>
-                    <label>Tab</label>
-                    <md-textarea v-model="newtab.tab" required></md-textarea>
-                  </md-field>
-                  <md-button class="md-raised  md-secondary" v-on:click="home">Cancel</md-button>
-                  <md-button class="md-raised  md-primary" v-on:click="newTabSubmit">Save New Tab</md-button>
-                </div>
-              </div>
-            </md-card-content>
-          </md-card>
-        </form>
-      </div>
+      </v-container>
+    </v-main>
+  </v-app>
 
-      <!-- edittabform -->
-      <div v-if="mode === 'edittabform'">
-        <form novalidate class="md-layout">
-          <md-card class="md-layout-item">
-            <md-card-header>
-              <div class="md-title">Edit Tab</div>
-            </md-card-header>
-            <md-card-content>
-              <div class="md-layout md-gutter">
-                <div class="md-layout-item md-small-size-100">
-                  <md-field>
-                    <label>Artist</label>
-                    <md-input v-model="edittab.doc.artist"></md-input>
-                  </md-field>
-                  <md-field>
-                    <label>Song</label>
-                    <md-input v-model="edittab.doc.song"></md-input>
-                  </md-field>
-                  <md-field>
-                    <label>Tab</label>
-                    <md-textarea v-model="edittab.doc.tab"></md-textarea>
-                  </md-field>
-                  <md-button class="md-raised  md-accent" v-on:click="deleteTab(edittab.doc._id)">Delete</md-button>
-                  <md-button class="md-raised  md-secondary" v-on:click="home">Cancel</md-button>
-                  <md-button class="md-raised  md-primary" v-on:click="editTabSubmit">Edit Tab</md-button>
-                </div>
-              </div>
-            </md-card-content>
-          </md-card>
-        </form>
-      </div>
-
-    </template>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
-  <script src="https://unpkg.com/vue-material"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pouchdb@7.1.1/dist/pouchdb.min.js"></script>
   <script src="js/app.js"></script>
 

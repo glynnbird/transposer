@@ -1,12 +1,10 @@
-Vue.use(VueMaterial.default)
-
 // single-pass replace
 const multiReplace = (str, replacements) => {
   let j
-  for(j in replacements) {
+  for (j in replacements) {
     str = str.replace(replacements[j][0], '__TOK' + j + '__')
   }
-  for(j in replacements) {
+  for (j in replacements) {
     str = str.replace('__TOK' + j + '__', replacements[j][1])
   }
   return str
@@ -51,6 +49,7 @@ const db = new PouchDB('tabs')
 // Vue.js App
 var app = new Vue({
   el: '#app',
+  vuetify: new Vuetify(),
   data: {
     mode: 'tablist',
     url: '',
@@ -58,6 +57,7 @@ var app = new Vue({
     tabs: [],
     singletab: {},
     transpose: 0,
+    transposeItems: [-11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
     newtab: {
       artist: '',
       song: '',
@@ -71,9 +71,9 @@ var app = new Vue({
   },
   methods: {
     copyToClipboard: function () {
-      cc(this.output.replace(/<b>/mg,'').replace(/<\/b>/mg,''))
+      cc(this.output.replace(/<b>/mg, '').replace(/<\/b>/mg, ''))
     },
-    startReplication: async function() {
+    startReplication: async function () {
       try {
         const doc = await db.get('_local/config')
         if (doc.url) {
@@ -84,10 +84,10 @@ var app = new Vue({
           this.sync = db.sync(doc.url)
           this.sync.on('change', function (info) {
             if (info.direction === 'pull') {
-              for(var i in info.change.docs) {
+              for (var i in info.change.docs) {
                 var c = info.change.docs[i]
                 let found = false
-                for(var j in app.tabs) {
+                for (var j in app.tabs) {
                   if (app.tabs[j]._id === c._id) {
                     if (c._deleted) {
                       Vue.delete(app.tabs, j)
@@ -110,16 +110,16 @@ var app = new Vue({
         console.log('No config found')
       }
     },
-    settings: function() {
+    settings: function () {
       this.mode = 'settings'
     },
-    shuffle: function() {
+    shuffle: function () {
       if (this.tabs.length > 0) {
         const i = Math.floor(Math.random() * this.tabs.length)
         this.viewTab(this.tabs[i]._id)
       }
     },
-    settingsSubmit: async function() {
+    settingsSubmit: async function () {
       if (this.url) {
         const obj = {
           _id: '_local/config',
@@ -151,7 +151,7 @@ var app = new Vue({
       this.mode = 'tablist'
     },
     deleteTab: async function (id) {
-      for(var i in this.tabs) {
+      for (var i in this.tabs) {
         if (this.tabs[i]._id === id) {
           await db.remove(id, this.tabs[i]._rev)
           Vue.delete(this.tabs, i)
@@ -160,8 +160,8 @@ var app = new Vue({
         }
       }
     },
-    editTab: function(id) {
-      for(var i in this.tabs) {
+    editTab: function (id) {
+      for (var i in this.tabs) {
         if (this.tabs[i]._id === id) {
           this.edittab.doc = this.tabs[i]
           this.edittab.i = i
@@ -170,14 +170,14 @@ var app = new Vue({
         }
       }
     },
-    editTabSubmit: async function() {
+    editTabSubmit: async function () {
       const response = await db.put(this.edittab.doc)
       this.edittab.doc._rev = response.rev
       this.tabs[this.edittab.i]._rev = response.rev
       this.mode = 'tablist'
     },
-    viewTab: function(id){
-      for(var i in this.tabs) {
+    viewTab: function (id) {
+      for (var i in this.tabs) {
         if (this.tabs[i]._id === id) {
           this.singletab = this.tabs[i]
           this.mode = 'singletab'
@@ -188,31 +188,31 @@ var app = new Vue({
   },
   mounted: async function () {
     const allDocs = await db.allDocs({ include_docs: true })
-    for(var i in allDocs.rows) {
+    for (var i in allDocs.rows) {
       this.tabs.push(allDocs.rows[i].doc)
     }
     this.startReplication()
   },
   computed: {
-    filteredTabs: function() {
+    filteredTabs: function () {
       let retval = []
       if (this.search.trim() === '') {
         retval = this.tabs
       } else {
         const s = this.search.toLowerCase().trim()
-        for(var i in this.tabs) {
+        for (var i in this.tabs) {
           const t = this.tabs[i]
           if (t.artist.toLowerCase().includes(s) || t.song.toLowerCase().includes(s)) {
             retval.push(t)
           }
         }
       }
-      const sorter = function(a,b) {
+      const sorter = function (a, b) {
         if (!a.artist || !b.artist) {
           return 0
         }
-        const A = a.artist.toLowerCase().replace(/^the /,'')+a.song.toLowerCase()
-        const B = b.artist.toLowerCase().replace(/^the /,'')+b.song.toLowerCase()
+        const A = a.artist.toLowerCase().replace(/^the /, '') + a.song.toLowerCase()
+        const B = b.artist.toLowerCase().replace(/^the /, '') + b.song.toLowerCase()
         if (A < B) {
           return -1
         } else if (A === B) {
@@ -223,17 +223,17 @@ var app = new Vue({
       }
       return retval.sort(sorter)
     },
-    output: function() {
+    output: function () {
       if (!this.singletab && !this.singletab.tab) {
         return ''
       }
-      const markdown =  this.singletab.tab.split('\n').map((l) => {
+      const markdown = this.singletab.tab.split('\n').map((l) => {
         // if this line only contains chords and spaces (not just spaces)
         if (l.match(TAB_LINE_REGEXP) && l.trim().length !== 0) {
           // find the chords on this line
           const matches = l.match(CHORD_REGEXP)
           const replacements = []
-          for(var i in matches) {
+          for (var i in matches) {
             const m = matches[i]
             const note = m.match(NOTE_REGEXP)
             if (note) {
@@ -250,10 +250,10 @@ var app = new Vue({
                 n2 = notesFlatAlt[transform(i3, this.transpose)]
               }
               const n = m.replace(n1, n2)
-              replacements.push([m, '<b>' + n + '</b>']) 
+              replacements.push([m, '<b>' + n + '</b>'])
             }
           }
-          
+
           // do the replacements in one pass
           if (replacements.length > 0) {
             return multiReplace(l, replacements)
