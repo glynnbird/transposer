@@ -80,9 +80,11 @@
         </v-card>
 
         <!-- tab list -->
-        <v-text-field v-if="mode === 'tablist'" clearable v-model="search" label="Search"></v-text-field>
+        <v-text-field v-if="mode === 'tablist'" clearable v-model="search" label="Search" @click:clear="clearSearch">
+        </v-text-field>
         <v-row v-if="mode === 'tablist'">
           <v-col>
+            <h3>Songs</h3>
             <v-list>
               <!-- if there are no tabs -->
               <v-list-item v-if="tabs.length === 0">
@@ -95,12 +97,11 @@
               </v-list-item>
 
               <!-- one list item per tab -->
-              <h3>Songs</h3>
               <v-list-item v-for="t in filteredTabs" :key="t._id" @click="viewTab(t._id)">
                 <v-list-item-content>
                   <v-list-item-title>{{ t.song }}</v-list-item-title>
                   <v-list-item-subtitle>{{ t.artist }}</v-list-item-subtitle>
-                  <div class="lyricssmall">{{ t.tab.substr(0,200) + '...'}}</div>
+                  <div class="lyricssmall">{{ t.tab.substr(0,50) + '...'}}</div>
                 </v-list-item-content>
               </v-list-item>
             </v-list>
@@ -109,7 +110,7 @@
             <!-- artist list -->
             <h3>Artists</h3>
             <v-list dense>
-              <v-list-item-group>
+              <v-list-item-group v-model="selectedArtist">
                 <v-list-item v-for="artist in artistList" :key="artist">
                   <v-list-item-content @click="quickSearch(artist)">{{ artist }}</v-list-item-content>
                 </v-list-item>

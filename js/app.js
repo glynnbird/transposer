@@ -69,9 +69,13 @@ var app = new Vue({
     },
     search: '',
     shuffleList: [],
-    shufflePos: 0
+    shufflePos: 0,
+    selectedArtist: null
   },
   methods: {
+    clearSearch: function () {
+      this.selectedArtist = null
+    },
     quickSearch: function (str) {
       this.search = str
       this.mode = 'tablist'
@@ -178,6 +182,7 @@ var app = new Vue({
     home: function () {
       this.mode = 'tablist'
       this.search = ''
+      this.selectedArtist = ''
       window.scrollTo(0, 0)
     },
     deleteTab: async function (id) {
