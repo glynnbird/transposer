@@ -196,7 +196,7 @@ var app = new Vue({
   computed: {
     filteredTabs: function () {
       let retval = []
-      if (this.search.trim() === '') {
+      if (!this.search || this.search.trim() === '') {
         retval = this.tabs
       } else {
         const s = this.search.toLowerCase().trim()

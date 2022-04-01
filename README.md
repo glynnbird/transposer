@@ -8,4 +8,16 @@ The songs can be shuffled, searched and retrieved and optionally transposed up o
 
 ![screenshot song](screenshot.png)
 
-See it in action here https://glynnbird.github.io/transposer/
+## Running Transposer
+
+You can simply visit the website here https://glynnbird.github.io/transposer/
+
+or clone this repo and run:
+
+```
+python -m SimpleHTTPServer 8000
+```
+
+to run locally.
+
+Either way, your songs are stored in the local browser using PouchDB. They are only synced to a remote CouchDB or Cloudant service if you configure it to do so.

@@ -68,7 +68,7 @@
         </v-card>
 
         <!-- tab list -->
-        <v-text-field v-if="mode === 'tablist'" v-model="search" label="Search"></v-text-field>
+        <v-text-field v-if="mode === 'tablist'" clearable v-model="search" label="Search"></v-text-field>
         <v-list v-if="mode === 'tablist'">
           <!-- if there are no tabs -->
           <v-list-item v-if="tabs.length === 0">
