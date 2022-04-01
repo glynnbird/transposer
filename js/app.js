@@ -75,6 +75,7 @@ var app = new Vue({
     quickSearch: function (str) {
       this.search = str
       this.mode = 'tablist'
+      window.scrollTo(0, 0)
     },
     copyToClipboard: function () {
       cc(this.output.replace(/<b>/mg, '').replace(/<\/b>/mg, ''))
