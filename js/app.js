@@ -67,7 +67,9 @@ var app = new Vue({
       doc: {},
       i: 0
     },
-    search: ''
+    search: '',
+    shuffleList: [],
+    shufflePos: 0
   },
   methods: {
     copyToClipboard: function () {
@@ -113,10 +115,31 @@ var app = new Vue({
     settings: function () {
       this.mode = 'settings'
     },
+    shuffleArray: function (array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array
+    },
+    primeShuffle: function () {
+      const len = this.tabs.length
+      const arr = []
+      for (let i = 0; i < len; i++) {
+        arr.push(i)
+      }
+      this.shuffleArray(arr)
+      this.shuffleList = arr
+      this.shufflePos = 0
+    },
     shuffle: function () {
-      if (this.tabs.length > 0) {
-        const i = Math.floor(Math.random() * this.tabs.length)
-        this.viewTab(this.tabs[i]._id)
+      if (this.shuffleList.length !== this.tabs.length) {
+        this.primeShuffle()
+      }
+      this.viewTab(this.tabs[this.shuffleList[this.shufflePos]]._id)
+      this.shufflePos++
+      if (this.shufflePos >= this.tabs.length) {
+        this.shufflePos = 0
       }
     },
     settingsSubmit: async function () {
