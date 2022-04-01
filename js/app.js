@@ -177,6 +177,8 @@ var app = new Vue({
     },
     home: function () {
       this.mode = 'tablist'
+      this.search = ''
+      window.scrollTo(0, 0)
     },
     deleteTab: async function (id) {
       for (var i in this.tabs) {
@@ -212,6 +214,7 @@ var app = new Vue({
           break
         }
       }
+      window.scrollTo(0, 0)
     }
   },
   mounted: async function () {
