@@ -4,6 +4,8 @@ An Offline First app that allows the storage of song chords/lyrics for the buddi
 
 The songs can be shuffled, searched and retrieved and optionally transposed up or down 12 increments.
 
-![screenshot](screenshot.png)
+![screenshot search](screenshot0.png)
+
+![screenshot song](screenshot.png)
 
 See it in action here https://glynnbird.github.io/transposer/
