@@ -62,7 +62,11 @@
           <v-select :items="transposeItems" v-model="transpose" label="Transpose"></v-select>
         </div>
         <v-card v-if="mode === 'singletab'">
-          <v-card-title>{{ singletab.song }}</v-card-title>
+          <v-card-title>{{ singletab.song }} &nbsp;
+            <v-btn icon x-small @click="editTab(singletab._id)">
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+          </v-card-title>
           <v-card-subtitle>
             {{ singletab.artist }}
             <v-btn icon x-small @click="quickSearch(singletab.artist)">
@@ -72,11 +76,6 @@
           <v-card-text>
             <pre class="output" v-html="output"></pre>
           </v-card-text>
-          <v-card-actions>
-            <v-btn icon @click="editTab(singletab._id)">
-              <v-icon>mdi-pencil</v-icon>
-            </v-btn>
-          </v-card-actions>
         </v-card>
 
         <!-- tab list -->
