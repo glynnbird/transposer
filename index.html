@@ -24,6 +24,10 @@
       font-size: 10px
     }
 
+    .transposer {
+      max-width: 200px;
+    }
+
     [v-cloak] {
       display: none;
     }
@@ -58,9 +62,6 @@
       </v-app-bar>
       <v-container fluid>
         <!-- single tab-->
-        <div v-if="mode === 'singletab'">
-          <v-select :items="transposeItems" v-model="transpose" label="Transpose"></v-select>
-        </div>
         <v-card v-if="mode === 'singletab'">
           <v-card-title>{{ singletab.song }} &nbsp;
             <v-btn icon x-small @click="editTab(singletab._id)">
@@ -72,6 +73,8 @@
             <v-btn icon x-small @click="quickSearch(singletab.artist)">
               <v-icon>mdi-account-search</v-icon>
             </v-btn>
+            <br />
+            <v-select class="transposer" :items="transposeItems" v-model="transpose" label="Transpose"></v-select>
           </v-card-subtitle>
           <v-card-text>
             <pre class="output" v-html="output"></pre>

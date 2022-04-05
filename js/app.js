@@ -212,6 +212,7 @@ var app = new Vue({
       this.mode = 'tablist'
     },
     viewTab: function (id) {
+      this.transpose = 0
       for (var i in this.tabs) {
         if (this.tabs[i]._id === id) {
           this.singletab = this.tabs[i]
