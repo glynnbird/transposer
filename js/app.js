@@ -56,6 +56,7 @@ var app = new Vue({
     sync: null,
     tabs: [],
     singletab: {},
+    transpositionAvailable: false,
     transpose: 0,
     transposeItems: [-11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
     newtab: {
@@ -217,10 +218,53 @@ var app = new Vue({
         if (this.tabs[i]._id === id) {
           this.singletab = this.tabs[i]
           this.mode = 'singletab'
+          // check whether this tab is transposable
+          this.transpositionAvailable = false
+          if (this.singletab && this.singletab.tab) {
+            const dummy = this.markdown(this.singletab.tab, -1)
+            // only show transposition selector, if there's chords in the tablature
+            this.transpositionAvailable = (dummy !== this.singletab.tab)
+          }
           break
         }
       }
       window.scrollTo(0, 0)
+    },
+    markdown: function (tab, transpose) {
+      return tab.split('\n').map((l) => {
+        // if this line only contains chords and spaces (not just spaces)
+        if (l.match(TAB_LINE_REGEXP) && l.trim().length !== 0) {
+          // find the chords on this line
+          const matches = l.match(CHORD_REGEXP)
+          const replacements = []
+          for (var i in matches) {
+            const m = matches[i]
+            const note = m.match(NOTE_REGEXP)
+            if (note) {
+              const n1 = note[0]
+              let n2 = n1
+              const i1 = notesSharp.indexOf(n1)
+              const i2 = notesFlat.indexOf(n1)
+              const i3 = notesFlatAlt.indexOf(n1)
+              if (i1 > -1) {
+                n2 = notesSharp[transform(i1, transpose)]
+              } else if (i2 > -1) {
+                n2 = notesFlat[transform(i2, transpose)]
+              } else if (i3 > -1) {
+                n2 = notesFlatAlt[transform(i3, transpose)]
+              }
+              const n = m.replace(n1, n2)
+              replacements.push([m, '<b>' + n + '</b>'])
+            }
+          }
+
+          // do the replacements in one pass
+          if (replacements.length > 0) {
+            return multiReplace(l, replacements)
+          }
+        }
+        return l
+      }).join('\n')
     }
   },
   mounted: async function () {
@@ -274,41 +318,7 @@ var app = new Vue({
       if (!this.singletab && !this.singletab.tab) {
         return ''
       }
-      const markdown = this.singletab.tab.split('\n').map((l) => {
-        // if this line only contains chords and spaces (not just spaces)
-        if (l.match(TAB_LINE_REGEXP) && l.trim().length !== 0) {
-          // find the chords on this line
-          const matches = l.match(CHORD_REGEXP)
-          const replacements = []
-          for (var i in matches) {
-            const m = matches[i]
-            const note = m.match(NOTE_REGEXP)
-            if (note) {
-              const n1 = note[0]
-              let n2 = n1
-              const i1 = notesSharp.indexOf(n1)
-              const i2 = notesFlat.indexOf(n1)
-              const i3 = notesFlatAlt.indexOf(n1)
-              if (i1 > -1) {
-                n2 = notesSharp[transform(i1, this.transpose)]
-              } else if (i2 > -1) {
-                n2 = notesFlat[transform(i2, this.transpose)]
-              } else if (i3 > -1) {
-                n2 = notesFlatAlt[transform(i3, this.transpose)]
-              }
-              const n = m.replace(n1, n2)
-              replacements.push([m, '<b>' + n + '</b>'])
-            }
-          }
-
-          // do the replacements in one pass
-          if (replacements.length > 0) {
-            return multiReplace(l, replacements)
-          }
-        }
-        return l
-      }).join('\n')
-      return markdown
+      return this.markdown(this.singletab.tab, this.transpose)
     }
   }
 })

@@ -74,7 +74,8 @@
               <v-icon>mdi-account-search</v-icon>
             </v-btn>
             <br />
-            <v-select class="transposer" :items="transposeItems" v-model="transpose" label="Transpose"></v-select>
+            <v-select v-if="transpositionAvailable" class="transposer" :items="transposeItems" v-model="transpose"
+              label="Transpose"></v-select>
           </v-card-subtitle>
           <v-card-text>
             <pre class="output" v-html="output"></pre>
