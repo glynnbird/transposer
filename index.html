@@ -31,6 +31,14 @@
     [v-cloak] {
       display: none;
     }
+    .newspaper {
+      column-count: 2;
+    }
+    
+    .lyrics {
+      white-space: pre;
+      column-span: all;
+    }
   </style>
   <title>Transposer - Transpose guitar tabs into any key</title>
   <!-- PWA manifest -->
@@ -62,25 +70,23 @@
       </v-app-bar>
       <v-container fluid>
         <!-- single tab-->
-        <v-card v-if="mode === 'singletab'">
-          <v-card-title>{{ singletab.song }} &nbsp;
+        <div v-if="mode === 'singletab'">
+          <h2>{{ singletab.song }} &nbsp;
             <v-btn icon x-small @click="editTab(singletab._id)">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
-          </v-card-title>
-          <v-card-subtitle>
-            {{ singletab.artist }}
+          </h2>
+          <h3>{{ singletab.artist }}             
             <v-btn icon x-small @click="quickSearch(singletab.artist)">
               <v-icon>mdi-account-search</v-icon>
             </v-btn>
-            <br />
+          </h3>
+          <div>
             <v-select v-if="transpositionAvailable" class="transposer" :items="transposeItems" v-model="transpose"
               label="Transpose"></v-select>
-          </v-card-subtitle>
-          <v-card-text>
-            <pre class="output" v-html="output"></pre>
-          </v-card-text>
-        </v-card>
+          </div>
+          <div class="newspaper output lyrics" v-html="output"></div>
+        </div>
 
         <!-- tab list -->
         <v-text-field v-if="mode === 'tablist'" clearable v-model="search" label="Search" @click:clear="clearSearch">
