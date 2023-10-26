@@ -71,20 +71,29 @@
       <v-container fluid>
         <!-- single tab-->
         <div v-if="mode === 'singletab'">
-          <h2>{{ singletab.song }} &nbsp;
-            <v-btn icon x-small @click="editTab(singletab._id)">
-              <v-icon>mdi-pencil</v-icon>
-            </v-btn>
-          </h2>
-          <h3>{{ singletab.artist }}             
-            <v-btn icon x-small @click="quickSearch(singletab.artist)">
-              <v-icon>mdi-account-search</v-icon>
-            </v-btn>
-          </h3>
-          <div>
-            <v-select v-if="transpositionAvailable" class="transposer" :items="transposeItems" v-model="transpose"
-              label="Transpose"></v-select>
-          </div>
+
+          <v-simple-table style="border-bottom: 1px dashed #aaa; margin-bottom:8px">
+            <v-row>
+              <v-col>
+                <h2>{{ singletab.song }} &nbsp;
+                  <v-btn icon x-small @click="editTab(singletab._id)">
+                    <v-icon>mdi-pencil</v-icon>
+                  </v-btn>
+                </h2>
+              </v-col>
+              <v-col>
+                <h2>{{ singletab.artist }}             
+                  <v-btn icon x-small @click="quickSearch(singletab.artist)">
+                    <v-icon>mdi-account-search</v-icon>
+                  </v-btn>
+                </h2>
+              </v-col>
+              <v-col>
+                <v-select dense v-if="transpositionAvailable" class="transposer" :items="transposeItems" v-model="transpose"></v-select>
+              </v-col>
+            </v-row>
+          </v-simple-table>
+
           <div class="newspaper output lyrics" v-html="output"></div>
         </div>
 
