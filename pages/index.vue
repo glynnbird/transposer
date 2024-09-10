@@ -1,8 +1,27 @@
 <script setup>
   const db = new PouchDB('transposer')
   const remoteUrl = localStorage.getItem('remoteUrl')
-  if (remoteUrl.value) {
-    PouchDB.sync('transposer', remoteUrl)
+  if (remoteUrl) {
+    console.log('PouchDB Sync')
+    PouchDB.sync('transposer', remoteUrl).on('change', function (info) {
+      // handle change
+      console.log('SYNC change', info)
+    }).on('paused', function (err) {
+      // replication paused (e.g. replication up to date, user went offline)
+      console.log('SYNC paused', err)
+    }).on('active', function () {
+      // replicate resumed (e.g. new changes replicating, user went back online)
+      console.log('SYNC active')
+    }).on('denied', function (err) {
+      // a document failed to replicate (e.g. due to permissions)
+      console.log('SYNC denied', err)
+    }).on('complete', function (info) {
+      // handle complete
+      console.log('SYNC complete', info)
+    }).on('error', function (err) {
+      // handle error
+      console.log('SYNC error', err)
+    })
   }
 
   // state
