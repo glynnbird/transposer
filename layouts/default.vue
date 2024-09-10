@@ -1,4 +1,7 @@
 <script setup>
+  // state
+  const shuffleList = useShuffleList()
+  let pick = 0
 
   // local page items
   const drawer = ref(0)
@@ -9,6 +12,14 @@
     window.scrollTo(0,0)
     await navigateTo('/')
   }
+
+  const shuffle = async () => {
+    console.log('pick', pick)
+    const id = shuffleList.value[pick]
+    pick++
+    pick = pick % shuffleList.value.length
+    await navigateTo(`/song/${shuffleList.value[pick]}`)
+  }
 </script>
 <template>   
   <v-app theme="light">
@@ -17,6 +28,9 @@
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
       <v-app-bar-title @click="clickHome()">Transposer</v-app-bar-title>
+      <template v-slot:append>
+        <v-btn icon="mdi-shuffle" @click="shuffle"></v-btn>
+      </template>
     </v-app-bar>
     <v-navigation-drawer v-model="drawer" location="left">
       <v-list>

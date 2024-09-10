@@ -5,6 +5,9 @@
     PouchDB.sync('transposer', remoteUrl)
   }
 
+  // state
+  const shuffleList = useShuffleList()
+
   // page items
   let allSongs = []
   const songs = ref(0)
@@ -25,12 +28,24 @@
     return 0
   }
 
+  // randomise the order of an array
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array
+  }
+
   // fetch all songs from PouchDB
   const loadSongs = async () => {
+    shuffleList.value = []
     const response = await db.allDocs({ include_docs: true})
     allSongs = response.rows.map((r) => {
+      shuffleList.value.push(r.doc._id)
       return r.doc
     })
+    shuffleList.value = shuffleArray(shuffleList.value)
     allSongs = allSongs.sort(sortFn)
     onUpdateSearch()
   }
