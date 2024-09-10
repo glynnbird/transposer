@@ -6,6 +6,8 @@
   transpose.value = 6
   const transposedTab = ref(2)
   transposedTab.value = ''
+  const transpositionAvailable = ref(3)
+  transpositionAvailable.value = false
 
   // transposition constants
   const TAB_LINE_REGEXP = new RegExp('^[ABCDEFGmbmajsusdim#976542/ ]+$')
@@ -78,7 +80,18 @@
   }
 
   const transposeChanged = () => {
-    transposedTab.value = calculateTransposition(song.value.tab, transpose.value - 6)
+    const dummy = calculateTransposition(song.value.tab, transpose.value - 6)
+    // if the the transposition is different from the original then
+    // there must be chords in the tab, so we need to show the
+    // transposition slider
+    if (dummy !== song.value.tab) {
+      transpositionAvailable.value = true
+    }
+    transposedTab.value = dummy
+  }
+
+  const edit = async () => {
+    await navigateTo(`/edit/${song.value._id}`)
   }
 
   const id = route.params.id
@@ -102,7 +115,7 @@
 }
 </style>
 <template>
-  <h3>{{ song.song }} - {{ song.artist }} <v-btn :href="'/edit/' + song._id" variant="plain" density="compact" icon="mdi-pencil"></v-btn></h3>
-  <v-slider show-ticks="always" step="1" max="12" tick-size="6" v-model="transpose" @update:modelValue="transposeChanged()"></v-slider>
+  <h3>{{ song.song }} - {{ song.artist }} <v-btn @click="edit" variant="plain" density="compact" icon="mdi-pencil"></v-btn></h3>
+  <v-slider v-if="transpositionAvailable" show-ticks="always" step="1" max="12" tick-size="6" v-model="transpose" @update:modelValue="transposeChanged()"></v-slider>
   <div class="newspaper output lyrics" v-html="transposedTab"></div>
 </template>
