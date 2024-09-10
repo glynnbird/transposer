@@ -7,7 +7,6 @@
   const transposedTab = ref(2)
   transposedTab.value = ''
 
-
   // transposition constants
   const TAB_LINE_REGEXP = new RegExp('^[ABCDEFGmbmajsusdim#976542/ ]+$')
   const CHORD_REGEXP = new RegExp('([ABCDEFGmbmajsusdim#76542]+)', 'g')
