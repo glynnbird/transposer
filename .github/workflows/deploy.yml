@@ -18,7 +18,7 @@ jobs:
       - run: npm install
       # NUXT_APP_BASE_URL=/transposer/ npx.... if running on default github pages
       # but we're running on rss.glynnbird.com
-      - run: NUXT_APP_BASE_URL=/transposer/ npx nuxt build --preset github_pages
+      - run: npx nuxt build --preset github_pages
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
