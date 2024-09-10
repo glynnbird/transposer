@@ -2,6 +2,7 @@
   const db = new PouchDB('transposer')
   const synced = useSynced()
   const syncing = useSyncing()
+  const songsList = useSongsList()
 
   // only sync on first load
   if (!synced.value) {
@@ -31,7 +32,6 @@
   const shuffleList = useShuffleList()
 
   // page items
-  let allSongs = []
   const songs = ref(0)
   songs.value = []
   const search = ref(1)
@@ -61,29 +61,34 @@
 
   // fetch all songs from PouchDB
   const loadSongs = async () => {
-    shuffleList.value = []
+    const songIds = []
     const response = await db.allDocs({ include_docs: true})
-    allSongs = response.rows.map((r) => {
-      shuffleList.value.push(r.doc._id)
+    songsList.value = response.rows.map((r) => {
+      songIds.push(r.doc._id)
       return r.doc
     })
-    shuffleList.value = shuffleArray(shuffleList.value)
-    allSongs = allSongs.sort(sortFn)
+    shuffleList.value = shuffleArray(songIds)
     onUpdateSearch()
   }
 
   // whenever the searchbox changes
   const onUpdateSearch = () => { 
     const lc = search.value.toLowerCase()
-    songs.value = allSongs.filter((s) => {
+    songs.value = songsList.value.filter((s) => {
       if (s.artist.toLowerCase().includes(lc) || s.song.toLowerCase().includes(lc)) {
         return true
       }
       return false
-    })
+    }).sort(sortFn)
     window.location.hash = lc
   }
-  await loadSongs()
+
+  // if we haven't already, load the songs
+  if (shuffleList.value.length === 0) {
+    console.log('Loading songs from PouchDB')
+    await loadSongs()
+  }
+  onUpdateSearch()
   
 </script>
 <template>  
