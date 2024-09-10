@@ -83,16 +83,10 @@
   await loadSongs()
   
 </script>
-<style setup>
-a:link, a:visited, a:hover {
-  color: black;
-  text-decoration: none;
-}
-</style>
 <template>  
   <v-text-field :label="'Search (' + songs.length + ')'" v-model="search" @update:modelValue="onUpdateSearch"></v-text-field>
   <v-card v-for="song in songs" variant="text" :ripple="false">
-    <v-card-title><NuxtLink :to="'/song/' + song._id">{{ song.song }}</NuxtLink></v-card-title>
-    <v-card-subtitle><NuxtLink :to="'/song/' + song._id">{{ song.artist }}</NuxtLink></v-card-subtitle>
+    <v-card-title @click="navigateTo('/song/' + song._id)">{{ song.song }}</v-card-title>
+    <v-card-subtitle>{{ song.artist }}</v-card-subtitle>
   </v-card>
 </template>
