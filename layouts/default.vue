@@ -1,6 +1,5 @@
 <script setup>
   // state
-  const route = useRoute()
   const shuffleList = useShuffleList()
   let pick = 0
 
@@ -29,7 +28,7 @@
         <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
       <v-app-bar-title @click="clickHome()">Transposer</v-app-bar-title>
-      <template v-slot:append v-if="route.name === 'index'">
+      <template v-slot:append>
         <v-btn icon="mdi-shuffle" @click="shuffle"></v-btn>
       </template>
     </v-app-bar>
