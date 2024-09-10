@@ -91,8 +91,10 @@
   font-family: Consolas, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace !important;
   font-size: 12px !important;
 }
-.newspaper {
+@media (width >= 1250px) {
+  .newspaper {
   column-count: 2;
+  }
 }
 .lyrics {
   white-space: pre;
