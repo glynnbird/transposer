@@ -1,6 +1,7 @@
 <script setup>
   // state
   const shuffleList = useShuffleList()
+  const syncing = useSyncing()
   let pick = 0
 
   // local page items
@@ -28,6 +29,7 @@
       </template>
       <v-app-bar-title @click="clickHome()">Transposer</v-app-bar-title>
       <template v-slot:append v-if="shuffleList.length > 0">
+        <v-progress-circular color="primary" indeterminate v-if="syncing" :size="22"></v-progress-circular>
         <v-btn icon="mdi-shuffle" @click="shuffle"></v-btn>
       </template>
     </v-app-bar>

@@ -1,11 +1,13 @@
 <script setup>
   const db = new PouchDB('transposer')
   const synced = useSynced()
+  const syncing = useSyncing()
 
   // only sync on first load
   if (!synced.value) {
     const remoteUrl = localStorage.getItem('remoteUrl')
     if (remoteUrl) {
+      syncing.value = true
       PouchDB.sync('transposer', remoteUrl).on('change', function (info) {
         // handle change
         console.log('SYNC change', info)
@@ -17,6 +19,7 @@
         console.log('SYNC complete', info)
         // set flag so that we only sync once per load
         synced.value = true
+        syncing.value = false
       }).on('error', function (err) {
         // handle error
         console.log('SYNC error', err)
