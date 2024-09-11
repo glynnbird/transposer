@@ -104,7 +104,7 @@
   font-family: Consolas, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace !important;
   font-size: 12px !important;
 }
-@media (width >= 1250px) {
+@media (width >= 1000px) {
   .newspaper {
   column-count: 2;
   }
@@ -113,9 +113,12 @@
   white-space: pre;
   column-span: all;
 }
+a:link, a:visited, a:hover {
+  color: black
+}
 </style>
 <template>
-  <h3>{{ song.song }} - {{ song.artist }} <v-btn @click="edit" variant="plain" density="compact" icon="mdi-pencil"></v-btn></h3>
+  <h3>{{ song.song }} - <NuxtLink :to="'/#' + encodeURIComponent(song.artist)">{{ song.artist }}</NuxtLink> <v-btn @click="edit" variant="plain" density="compact" icon="mdi-pencil"></v-btn></h3>
   <v-slider v-if="transpositionAvailable" show-ticks="always" step="1" max="12" tick-size="6" v-model="transpose" @update:modelValue="transposeChanged()"></v-slider>
   <div class="newspaper output lyrics" v-html="transposedTab"></div>
 </template>

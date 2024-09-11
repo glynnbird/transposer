@@ -37,7 +37,7 @@
   const search = ref(1)
   search.value = ''
   if (window.location.hash) {
-    search.value = window.location.hash.replace('#', '')
+    search.value = decodeURIComponent(window.location.hash.replace('#', ''))
   }
 
   // sort by artist
@@ -72,7 +72,10 @@
   }
 
   // whenever the searchbox changes
-  const onUpdateSearch = () => { 
+  const onUpdateSearch = () => {
+    if (!search.value) {
+      search.value = ''
+    }
     const lc = search.value.toLowerCase()
     songs.value = songsList.value.filter((s) => {
       if (s.artist.toLowerCase().includes(lc) || s.song.toLowerCase().includes(lc)) {
@@ -87,12 +90,12 @@
   if (shuffleList.value.length === 0) {
     console.log('Loading songs from PouchDB')
     await loadSongs()
+  } else {
+    onUpdateSearch()
   }
-  onUpdateSearch()
-  
 </script>
 <template>  
-  <v-text-field :label="'Search (' + songs.length + ')'" v-model="search" @update:modelValue="onUpdateSearch"></v-text-field>
+  <v-text-field clearable @click:clear="onUpdateSearch" :label="'Search (' + songs.length + ')'" v-model="search" @update:modelValue="onUpdateSearch"></v-text-field>
   <v-card v-for="song in songs" variant="text" :ripple="false">
     <v-card-title @click="navigateTo('/song/' + song._id)">{{ song.song }}</v-card-title>
     <v-card-subtitle>{{ song.artist }}</v-card-subtitle>
