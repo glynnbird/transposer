@@ -1,5 +1,5 @@
 export const get = async function(kv, id) {
-  const r = await kv.get(is=d)
+  const r = await kv.get(id)
   if (r === null) {
     return { ok: false }
   } else {
