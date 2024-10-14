@@ -27,10 +27,10 @@ export const get = async function(kv, id) {
 }
 
 export const list = async function(kv) {
-  const l = await kv.list({ prefix: 'doc:' })
+  const l = await kv.list(/*{ prefix: 'doc:' }*/)
   const output = l.keys.map((k) => {
     return {
-      id: k.name.replace(/^doc:/,''),
+      id: k.name,
       ...k.metadata
     }
   })
