@@ -4,8 +4,8 @@ export const get = async function(kv, id) {
     return { ok: false }
   } else {
     const j = JSON.parse(r)
-    j.doc.id = id
-    return { ok: true, doc: j.doc }
+    j.id = id
+    return { ok: true, doc: j }
   }
 }
 
