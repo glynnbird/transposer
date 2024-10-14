@@ -22,3 +22,10 @@ logs
 .env
 .env.*
 !.env.example
+
+terraform.tfvars
+terraform.tfstate.d
+.terraform
+code/dist
+code/node_modules
+functions/api/*.js

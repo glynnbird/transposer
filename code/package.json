@@ -1,0 +1,14 @@
+{
+  "name": "transposer-code",
+  "version": "1.0.0",
+  "description": "Workers code",
+  "scripts": {
+    "build": "./build.sh"
+  },
+  "author": "Glynn Bird <glynn.bird@gmail.com>",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "rollup": "^4.22.4"
+  }
+}
