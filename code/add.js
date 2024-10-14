@@ -32,8 +32,8 @@ export async function onRequest (context) {
 
   // if the mandatiry fields are there
   if (json.artist && json.song && json.tab) {
-    // create a time-based key
-    const id = generateid()
+    // if an id is not supplied, generate one
+    const id = json.id || generateid()
     const h = await hash(`${json.artist}|${json.song}|${json.tab}`)
 
     const doc = {

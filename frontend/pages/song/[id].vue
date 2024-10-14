@@ -1,13 +1,18 @@
 <script setup>
-  const db = new PouchDB('transposer')
   const route = useRoute()
+  const auth = useAuth()
   const song = ref(0)
+  song.value = {}
   const transpose = ref(1)
   transpose.value = 6
   const transposedTab = ref(2)
   transposedTab.value = ''
   const transpositionAvailable = ref(3)
   transpositionAvailable.value = false
+
+  // config
+  const config = useRuntimeConfig()
+  const apiHome = config.public['apiBase'] || window.location.origin
 
   // transposition constants
   const TAB_LINE_REGEXP = new RegExp('^[ABCDEFGmbmajsusdim#976542/ ]+$')
@@ -91,13 +96,26 @@
   }
 
   const edit = async () => {
-    await navigateTo(`/edit/${song.value._id}`)
+    await navigateTo(`/edit/${song.value.id}`)
   }
 
   const id = route.params.id
-  song.value = await db.get(id)
+  try {
+    //  fetch the list from the API
+    console.log('API', '/get', `${apiHome}/api/get`)
+    const r = await useFetch(`${apiHome}/api/get`, {
+      method: 'post',
+      headers: {
+        'content-type': 'application/json',
+        apikey: auth.value.apiKey
+      },
+      body: JSON.stringify({ id })
+    })
+    song.value = r.data.value.doc
+  } catch (e) {
+    console.error('failed to fetch list of songs', e)
+  }
   transposeChanged()
-  
 </script>
 <style setup>
 .output {

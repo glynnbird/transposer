@@ -1,17 +1,50 @@
 <script setup>
-  const db = new PouchDB('transposer')
   const route = useRoute()
+  const auth = useAuth()
   const song = ref(0)
   const id = route.params.id
-  song.value = await db.get(id)
+
+  // config
+  const config = useRuntimeConfig()
+  const apiHome = config.public['apiBase'] || window.location.origin
+
+  try {
+    //  fetch the list from the API
+    console.log('API', '/get', `${apiHome}/api/get`)
+    const r = await useFetch(`${apiHome}/api/get`, {
+      method: 'post',
+      headers: {
+        'content-type': 'application/json',
+        apikey: auth.value.apiKey
+      },
+      body: JSON.stringify({ id })
+    })
+    song.value = r.data.value.doc
+  } catch (e) {
+    console.error('failed to fetch list of songs', e)
+  }
 
   const save = async () => {
-    await db.put(song.value)
-    await navigateTo(`/song/${song.value._id}`)
+    try {
+      //  fetch the list from the API
+      console.log('API', '/add', `${apiHome}/api/add`)
+      const r = await useFetch(`${apiHome}/api/add`, {
+        method: 'post',
+        headers: {
+          'content-type': 'application/json',
+          apikey: auth.value.apiKey
+        },
+        body: JSON.stringify(song.value)
+      })
+    } catch (e) {
+      console.error('failed to fetch list of songs', e)
+    }
+    await navigateTo(`/song/${song.value.id}`)
   }
 
   const deleteSong = async () => {
-    await db.remove(song.value._id, song.value._rev)
+    // not implemented yet
+    //await db.remove(song.value._id, song.value._rev)
     await navigateTo('/')
   }
   

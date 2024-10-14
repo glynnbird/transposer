@@ -1,32 +1,13 @@
 <script setup>
-  const db = new PouchDB('transposer')
+  //state
   const synced = useSynced()
   const syncing = useSyncing()
   const songsList = useSongsList()
+  const auth = useAuth()
 
-  // only sync on first load
-  if (!synced.value) {
-    const remoteUrl = localStorage.getItem('remoteUrl')
-    if (remoteUrl) {
-      syncing.value = true
-      PouchDB.sync('transposer', remoteUrl).on('change', function (info) {
-        // handle change
-        console.log('SYNC change', info)
-      }).on('denied', function (err) {
-        // a document failed to replicate (e.g. due to permissions)
-        console.log('SYNC denied', err)
-      }).on('complete', function (info) {
-        // handle complete
-        console.log('SYNC complete', info)
-        // set flag so that we only sync once per load
-        synced.value = true
-        syncing.value = false
-      }).on('error', function (err) {
-        // handle error
-        console.log('SYNC error', err)
-      })
-    }
-  }
+  // config
+  const config = useRuntimeConfig()
+  const apiHome = config.public['apiBase'] || window.location.origin
 
   // state
   const shuffleList = useShuffleList()
@@ -59,14 +40,29 @@
     return array
   }
 
-  // fetch all songs from PouchDB
+  // fetch all songs from Cloudflare
   const loadSongs = async () => {
     const songIds = []
-    const response = await db.allDocs({ include_docs: true})
-    songsList.value = response.rows.map((r) => {
-      songIds.push(r.doc._id)
-      return r.doc
-    })
+    try {
+      //  fetch the list from the API
+      console.log('API', '/list', `${apiHome}/api/list`)
+      syncing.value = true
+      const r = await useFetch(`${apiHome}/api/list`, {
+        method: 'post',
+        headers: {
+          'content-type': 'application/json',
+          apikey: auth.value.apiKey
+        }
+      })
+      songsList.value = r.data.value.list.map((r) => {
+        songIds.push(r.id)
+        return r
+      })
+      syncing.value = false
+      synced.value = true
+    } catch (e) {
+      console.error('failed to fetch list of songs', e)
+    }
     shuffleList.value = shuffleArray(songIds)
     onUpdateSearch()
   }
@@ -88,7 +84,6 @@
 
   // if we haven't already, load the songs
   if (shuffleList.value.length === 0) {
-    console.log('Loading songs from PouchDB')
     await loadSongs()
   } else {
     onUpdateSearch()
@@ -97,7 +92,7 @@
 <template>  
   <v-text-field clearable @click:clear="onUpdateSearch" :label="'Search (' + songs.length + ')'" v-model="search" @update:modelValue="onUpdateSearch"></v-text-field>
   <v-card v-for="song in songs" variant="text" :ripple="false">
-    <v-card-title @click="navigateTo('/song/' + song._id)">{{ song.song }}</v-card-title>
+    <v-card-title @click="navigateTo('/song/' + song.id)">{{ song.song }}</v-card-title>
     <v-card-subtitle>{{ song.artist }}</v-card-subtitle>
   </v-card>
 </template>

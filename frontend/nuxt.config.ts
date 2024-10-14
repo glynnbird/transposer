@@ -4,6 +4,11 @@ export default defineNuxtConfig({
   build: {
     transpile: ['vuetify'],
   },
+  runtimeConfig: {
+    public: {
+      apiBase: 'https://transposer2.glynnbird.com'
+    }
+  },
   ssr: false,
   modules: [
     (_options, nuxt) => {
@@ -25,8 +30,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: { 
-      link: [ { rel: 'manifest', href: '/transposer.webmanifest'} ],
-      script: [ { src: 'https://cdn.jsdelivr.net/npm/pouchdb@9.0.0/dist/pouchdb.min.js'}]
+      link: [ { rel: 'manifest', href: '/transposer.webmanifest'} ]
     }
   }
 })

@@ -2,6 +2,9 @@
   // state
   const shuffleList = useShuffleList()
   const syncing = useSyncing()
+  const auth = useAuth()
+  const route = useRoute()
+
   let pick = 0
 
   // local page items
@@ -35,9 +38,10 @@
     </v-app-bar>
     <v-navigation-drawer v-model="drawer" location="left">
       <v-list>
-        <v-list-item prepend-icon="mdi-home" title="Home" @click="clickHome()"></v-list-item>
-        <v-list-item prepend-icon="mdi-cog" title="Settings" @click="navigateTo('/settings')"></v-list-item>
-        <v-list-item prepend-icon="mdi-plus" title="Add" @click="navigateTo('/add')"></v-list-item>
+        <v-list-item v-if="auth.authenticated" prepend-icon="mdi-home" title="Home" @click="clickHome()"></v-list-item>
+        <v-list-item v-if="auth.authenticated" prepend-icon="mdi-plus" title="Add" @click="navigateTo('/add')"></v-list-item>
+        <v-list-item v-if="auth.authenticated" prepend-icon="mdi-logout" title="Logout" @click="navigateTo('/logout')"></v-list-item>
+        <v-list-item v-if="!auth.authenticated" prepend-icon="mdi-login" title="Login" @click="navigateTo('/login')"></v-list-item>
       </v-list>
     </v-navigation-drawer>
     <v-main>
