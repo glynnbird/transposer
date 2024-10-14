@@ -43,13 +43,11 @@ export async function onRequest (context) {
       date: new Date().toISOString(),
       hash: h
     }
-    console.log(doc)
     const metadata = {
       artist: doc.artist,
       song: doc.song,
       hash: h
     }
-    console.log(meta)
     const index = {
     }
 
