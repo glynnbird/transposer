@@ -3,15 +3,15 @@ import { mustBePOST, mustBeJSON, apiKey, handleCORS } from './lib/checks.js'
 import { add } from './lib/db.js'
 
 const generateid = function () {
-  //this is a simple randomness generator.. assuming that the probability of 
+  // this is a simple randomness generator.. assuming that the probability of
   // generating the same id twice is tiny
-  const chars = "ABCDEFGHJKLMNPQRTUVWXYZ2346789";
-  let treeid = "";
-  for (var i = 0; i < 8; i++) {
-    let nextchar = Math.floor(Math.random() * chars.length);
-    treeid = treeid + chars[nextchar];
+  const chars = 'ABCDEFGHJKLMNPQRTUVWXYZ2346789'
+  let treeid = ''
+  for (let i = 0; i < 8; i++) {
+    const nextchar = Math.floor(Math.random() * chars.length)
+    treeid = treeid + chars[nextchar]
   }
-  return treeid;
+  return treeid
 }
 
 const hash = async (str) => {
@@ -22,7 +22,7 @@ const hash = async (str) => {
   return hashHex
 }
 
-export async function onRequest(context) {
+export async function onRequest (context) {
   // handle POST/JSON/apikey chcecks
   const r = handleCORS(context.request) || apiKey(context.request, context.env) || mustBePOST(context.request) || mustBeJSON(context.request)
   if (r) return r
@@ -43,11 +43,13 @@ export async function onRequest(context) {
       date: new Date().toISOString(),
       hash: h
     }
+    console.log(doc)
     const metadata = {
       artist: doc.artist,
       song: doc.song,
       hash: h
     }
+    console.log(meta)
     const index = {
     }
 
@@ -57,8 +59,7 @@ export async function onRequest(context) {
     // send response
     return new Response(JSON.stringify(response), okResponse)
   }
-  
+
   // everyone else gets a 400 response
   return new Response(notOk, notOkResponse)
-
 }
