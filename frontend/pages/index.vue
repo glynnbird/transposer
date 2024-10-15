@@ -1,4 +1,7 @@
 <script setup>
+  // constants
+  const SONG_CACHE_KEY = 'songcache'
+
   //state
   const synced = useSynced()
   const syncing = useSyncing()
@@ -58,6 +61,7 @@
         songIds.push(r.id)
         return r
       })
+      localStorage.setItem(SONG_CACHE_KEY, JSON.stringify(songsList.value))
       syncing.value = false
       synced.value = true
     } catch (e) {
@@ -84,7 +88,21 @@
 
   // if we haven't already, load the songs
   if (shuffleList.value.length === 0) {
-    await loadSongs()
+    // load songs from cache
+    const v = localStorage.getItem(SONG_CACHE_KEY)
+    if (v) {
+      console.log('restoring songs from cache')
+      songsList.value = JSON.parse(v)
+      onUpdateSearch()
+    }
+    
+    // in the background
+    setTimeout(async () => {
+      // load songs from the API
+      await loadSongs()
+      onUpdateSearch()
+    }, 1)
+
   } else {
     onUpdateSearch()
   }

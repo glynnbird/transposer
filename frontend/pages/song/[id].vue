@@ -101,17 +101,32 @@
 
   const id = route.params.id
   try {
-    //  fetch the list from the API
-    console.log('API', '/get', `${apiHome}/api/get`)
-    const r = await useFetch(`${apiHome}/api/get`, {
-      method: 'post',
-      headers: {
-        'content-type': 'application/json',
-        apikey: auth.value.apiKey
-      },
-      body: JSON.stringify({ id })
-    })
-    song.value = r.data.value.doc
+
+    // load songs from cache
+    const v = localStorage.getItem(id)
+    if (v) {
+      try {
+        song.value = JSON.parse(v)
+      } catch {
+        // oops
+      }
+    }
+    setTimeout(async() => {
+      //  fetch the list from the API
+      console.log('API', '/get', `${apiHome}/api/get`)
+      const r = await useFetch(`${apiHome}/api/get`, {
+        method: 'post',
+        headers: {
+          'content-type': 'application/json',
+          apikey: auth.value.apiKey
+        },
+        body: JSON.stringify({ id })
+      })
+      song.value = r.data.value.doc
+      console.log(song.value)
+      localStorage.setItem(id, JSON.stringify(song.value))
+    }, 1)
+
   } catch (e) {
     console.error('failed to fetch list of songs', e)
   }

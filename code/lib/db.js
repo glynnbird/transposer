@@ -41,9 +41,7 @@ export const add = async function (kv, json) {
 }
 
 export const del = async function (kv, id) {
-
   // delete original doc
   await kv.delete(id)
-
   return { ok: true }
 }
