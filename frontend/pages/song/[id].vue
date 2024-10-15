@@ -8,6 +8,8 @@
   transpose.value = 6
   const transpositionAvailable = ref(3)
   transpositionAvailable.value = false
+  const syncing = ref(4)
+  syncing.value = false
 
   // config
   const config = useRuntimeConfig()
@@ -138,8 +140,8 @@
     // 2. Or the hash in the songList is different from the cached hash
     // 3. Or we fail to parse the cached song
     if (reload) {
-      setTimeout(async() => {
       //  fetch the list from the API
+      syncing.value = true
       console.log('API', '/get', `${apiHome}/api/get`)
       const r = await useFetch(`${apiHome}/api/get`, {
         method: 'post',
@@ -151,7 +153,7 @@
       })
       song.value = r.data.value.doc
       localStorage.setItem(id, JSON.stringify(song.value))
-    }, 1)
+      syncing.value = false
     }
 
 
@@ -178,7 +180,8 @@ a:link, a:visited, a:hover {
 }
 </style>
 <template>
-  <h3>{{ song.song }} - <NuxtLink :to="'/#' + encodeURIComponent(song.artist)">{{ song.artist }}</NuxtLink> <v-btn @click="edit" variant="plain" density="compact" icon="mdi-pencil"></v-btn></h3>
-  <v-slider v-if="transpositionAvailable" show-ticks="always" step="1" max="12" tick-size="6" v-model="transpose"></v-slider>
-  <div class="newspaper output lyrics" v-html="transposedTab"></div>
+  <v-progress-linear v-if="syncing" color="yellow-darken-2" indeterminate ></v-progress-linear>
+  <h3 v-if="song.id">{{ song.song }} - <NuxtLink :to="'/#' + encodeURIComponent(song.artist)">{{ song.artist }}</NuxtLink> <v-btn @click="edit" variant="plain" density="compact" icon="mdi-pencil"></v-btn></h3>
+  <v-slider v-if="song.id && transpositionAvailable" show-ticks="always" step="1" max="12" tick-size="6" v-model="transpose"></v-slider>
+  <div v-if="song.id" class="newspaper output lyrics" v-html="transposedTab"></div>
 </template>
