@@ -24,7 +24,8 @@ logs
 !.env.example
 
 terraform.tfvars
-terraform.tfstate.d
+terraform.tfstate
+terraform.tfstate.backup
 .terraform
 code/dist
 code/node_modules
