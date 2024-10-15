@@ -1,12 +1,11 @@
 <script setup>
   const route = useRoute()
   const auth = useAuth()
+  const songsList = useSongsList()
   const song = ref(0)
   song.value = {}
   const transpose = ref(1)
   transpose.value = 6
-  // const transposedTab = ref(2)
-  // transposedTab.value = ''
   const transpositionAvailable = ref(3)
   transpositionAvailable.value = false
 
@@ -84,17 +83,7 @@
     }).join('\n')
   }
 
-  // const transposeChanged = () => {
-  //   const dummy = calculateTransposition(song.value.tab, transpose.value - 6)
-  //   // if the the transposition is different from the original then
-  //   // there must be chords in the tab, so we need to show the
-  //   // transposition slider
-  //   if (dummy !== song.value.tab) {
-  //     transpositionAvailable.value = true
-  //   }
-  //   transposedTab.value = dummy
-  // }
-
+  // calculate the tab with the currently selected transpose number
   const transposedTab = computed(() => {
     if (!song.value.tab) {
       return ''
@@ -115,14 +104,41 @@
 
     // load songs from cache
     const v = localStorage.getItem(id)
+    let reload = false
     if (v) {
       try {
         song.value = JSON.parse(v)
+        console.log('From cache', JSON.stringify(song.value.hash))
+        // locate the song in the songsList
+        let found = false
+        for(let i = 0; i < songsList.value.length; i++) {
+          const s = songsList.value[i]
+          if (s.id === id) {
+            console.log('Found in songList', s.hash)
+            if (song.value.hash !== s.hash) {
+              reload = true
+            }
+            found = true
+            break
+          }
+        }
+        if (!found) {
+          reload = true
+        }
       } catch {
         // oops
+        reload = true
       }
+    } else {
+      reload = true
     }
-    setTimeout(async() => {
+
+    // we need to reload if:
+    // 1. There is no cached copy
+    // 2. Or the hash in the songList is different from the cached hash
+    // 3. Or we fail to parse the cached song
+    if (reload) {
+      setTimeout(async() => {
       //  fetch the list from the API
       console.log('API', '/get', `${apiHome}/api/get`)
       const r = await useFetch(`${apiHome}/api/get`, {
@@ -137,6 +153,8 @@
       console.log(song.value)
       localStorage.setItem(id, JSON.stringify(song.value))
     }, 1)
+    }
+
 
   } catch (e) {
     console.error('failed to fetch list of songs', e)

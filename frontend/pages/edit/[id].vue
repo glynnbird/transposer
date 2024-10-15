@@ -36,6 +36,7 @@
         },
         body: JSON.stringify(song.value)
       })
+      localStorage.removeItem(song.id)
     } catch (e) {
       console.error('failed to edit song', e)
     }
@@ -56,6 +57,7 @@
         body: JSON.stringify(song.value)
       })
       console.log('Response', r.data.value)
+      localStorage.removeItem(song.id)
     } catch (e) {
       console.error('failed to delete song', e)
     }
