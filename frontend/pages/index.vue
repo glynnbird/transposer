@@ -16,8 +16,8 @@
   const shuffleList = useShuffleList()
 
   // page items
-  const songs = ref(0)
-  songs.value = []
+  // const songs = ref(0)
+  // songs.value = []
   const search = ref(1)
   search.value = ''
   if (window.location.hash) {
@@ -68,23 +68,27 @@
       console.error('failed to fetch list of songs', e)
     }
     shuffleList.value = shuffleArray(songIds)
-    onUpdateSearch()
+    //onUpdateSearch()
   }
 
   // whenever the searchbox changes
-  const onUpdateSearch = () => {
-    if (!search.value) {
-      search.value = ''
+  const songs = computed(() => {
+    console.log('computing songs')
+    let sv = search.value
+    if (!sv) {
+      sv = ''
     }
-    const lc = search.value.toLowerCase()
-    songs.value = songsList.value.filter((s) => {
+    const lc = sv.toLowerCase()
+    if (lc !== window.location.hash) {
+      window.location.hash = lc
+    }
+    return songsList.value.filter((s) => {
       if (s.artist.toLowerCase().includes(lc) || s.song.toLowerCase().includes(lc)) {
         return true
       }
       return false
     }).sort(sortFn)
-    window.location.hash = lc
-  }
+  })
 
   // if we haven't already, load the songs
   if (shuffleList.value.length === 0) {
@@ -93,22 +97,18 @@
     if (v) {
       console.log('restoring songs from cache')
       songsList.value = JSON.parse(v)
-      onUpdateSearch()
     }
     
     // in the background
     setTimeout(async () => {
       // load songs from the API
       await loadSongs()
-      onUpdateSearch()
     }, 1)
 
-  } else {
-    onUpdateSearch()
   }
 </script>
 <template>  
-  <v-text-field clearable @click:clear="onUpdateSearch" :label="'Search (' + songs.length + ')'" v-model="search" @update:modelValue="onUpdateSearch"></v-text-field>
+  <v-text-field clearable :label="'Search (' + songs.length + ')'" v-model="search"></v-text-field>
   <v-card v-for="song in songs" variant="text" :ripple="false">
     <v-card-title @click="navigateTo('/song/' + song.id)">{{ song.song }}</v-card-title>
     <v-card-subtitle>{{ song.artist }}</v-card-subtitle>

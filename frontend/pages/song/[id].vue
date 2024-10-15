@@ -5,8 +5,8 @@
   song.value = {}
   const transpose = ref(1)
   transpose.value = 6
-  const transposedTab = ref(2)
-  transposedTab.value = ''
+  // const transposedTab = ref(2)
+  // transposedTab.value = ''
   const transpositionAvailable = ref(3)
   transpositionAvailable.value = false
 
@@ -84,16 +84,27 @@
     }).join('\n')
   }
 
-  const transposeChanged = () => {
-    const dummy = calculateTransposition(song.value.tab, transpose.value - 6)
-    // if the the transposition is different from the original then
-    // there must be chords in the tab, so we need to show the
-    // transposition slider
-    if (dummy !== song.value.tab) {
+  // const transposeChanged = () => {
+  //   const dummy = calculateTransposition(song.value.tab, transpose.value - 6)
+  //   // if the the transposition is different from the original then
+  //   // there must be chords in the tab, so we need to show the
+  //   // transposition slider
+  //   if (dummy !== song.value.tab) {
+  //     transpositionAvailable.value = true
+  //   }
+  //   transposedTab.value = dummy
+  // }
+
+  const transposedTab = computed(() => {
+    if (!song.value.tab) {
+      return ''
+    }
+    const r = calculateTransposition(song.value.tab, transpose.value - 6)
+    if (r !== song.value.tab) {
       transpositionAvailable.value = true
     }
-    transposedTab.value = dummy
-  }
+    return r
+  })
 
   const edit = async () => {
     await navigateTo(`/edit/${song.value.id}`)
@@ -130,7 +141,6 @@
   } catch (e) {
     console.error('failed to fetch list of songs', e)
   }
-  transposeChanged()
 </script>
 <style setup>
 .output {
@@ -152,6 +162,6 @@ a:link, a:visited, a:hover {
 </style>
 <template>
   <h3>{{ song.song }} - <NuxtLink :to="'/#' + encodeURIComponent(song.artist)">{{ song.artist }}</NuxtLink> <v-btn @click="edit" variant="plain" density="compact" icon="mdi-pencil"></v-btn></h3>
-  <v-slider v-if="transpositionAvailable" show-ticks="always" step="1" max="12" tick-size="6" v-model="transpose" @update:modelValue="transposeChanged()"></v-slider>
+  <v-slider v-if="transpositionAvailable" show-ticks="always" step="1" max="12" tick-size="6" v-model="transpose"></v-slider>
   <div class="newspaper output lyrics" v-html="transposedTab"></div>
 </template>
