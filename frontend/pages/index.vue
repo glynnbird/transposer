@@ -3,8 +3,6 @@
   const SONG_CACHE_KEY = 'songcache'
 
   //state
-  const synced = useSynced()
-  const syncing = useSyncing()
   const songsList = useSongsList()
   const auth = useAuth()
 
@@ -16,13 +14,13 @@
   const shuffleList = useShuffleList()
 
   // page items
-  // const songs = ref(0)
-  // songs.value = []
   const search = ref(1)
   search.value = ''
   if (window.location.hash) {
     search.value = decodeURIComponent(window.location.hash.replace('#', ''))
   }
+  const syncing = ref(2)
+  syncing.value = false
 
   // sort by artist
   const sortFn = function (a, b) {
@@ -63,25 +61,24 @@
       })
       localStorage.setItem(SONG_CACHE_KEY, JSON.stringify(songsList.value))
       syncing.value = false
-      synced.value = true
     } catch (e) {
       console.error('failed to fetch list of songs', e)
     }
     shuffleList.value = shuffleArray(songIds)
-    //onUpdateSearch()
   }
 
   // whenever the searchbox changes
   const songs = computed(() => {
-    console.log('computing songs')
     let sv = search.value
     if (!sv) {
       sv = ''
     }
     const lc = sv.toLowerCase()
+    // update the browser # url if needed
     if (lc !== window.location.hash) {
       window.location.hash = lc
     }
+    // return the song list filtered to match the contents of the search box
     return songsList.value.filter((s) => {
       if (s.artist.toLowerCase().includes(lc) || s.song.toLowerCase().includes(lc)) {
         return true
@@ -108,6 +105,7 @@
   }
 </script>
 <template>  
+  <v-progress-linear v-if="syncing" color="yellow-darken-2" indeterminate ></v-progress-linear>
   <v-text-field clearable :label="'Search (' + songs.length + ')'" v-model="search"></v-text-field>
   <v-card v-for="song in songs" variant="text" :ripple="false">
     <v-card-title @click="navigateTo('/song/' + song.id)">{{ song.song }}</v-card-title>

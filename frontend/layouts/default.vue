@@ -1,9 +1,7 @@
 <script setup>
   // state
   const shuffleList = useShuffleList()
-  const syncing = useSyncing()
   const auth = useAuth()
-  const route = useRoute()
 
   let pick = 0
 
@@ -32,8 +30,7 @@
       </template>
       <v-app-bar-title @click="clickHome()">Transposer</v-app-bar-title>
       <template v-slot:append v-if="shuffleList.length > 0">
-        <v-progress-circular color="primary" indeterminate v-if="syncing" :size="22"></v-progress-circular>
-        <v-btn icon="mdi-shuffle" @click="shuffle"></v-btn>
+        <v-btn v-if="shuffleList.length > 0" icon="mdi-shuffle" @click="shuffle"></v-btn>
       </template>
     </v-app-bar>
     <v-navigation-drawer v-model="drawer" location="left">

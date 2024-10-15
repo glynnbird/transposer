@@ -108,13 +108,13 @@
     if (v) {
       try {
         song.value = JSON.parse(v)
-        console.log('From cache', JSON.stringify(song.value.hash))
         // locate the song in the songsList
         let found = false
         for(let i = 0; i < songsList.value.length; i++) {
           const s = songsList.value[i]
           if (s.id === id) {
-            console.log('Found in songList', s.hash)
+            // if our cached hash is different from the songsList
+            // we need to reload it from Cloudflare KV
             if (song.value.hash !== s.hash) {
               reload = true
             }
@@ -150,7 +150,6 @@
         body: JSON.stringify({ id })
       })
       song.value = r.data.value.doc
-      console.log(song.value)
       localStorage.setItem(id, JSON.stringify(song.value))
     }, 1)
     }
