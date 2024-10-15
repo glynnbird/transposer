@@ -37,14 +37,28 @@
         body: JSON.stringify(song.value)
       })
     } catch (e) {
-      console.error('failed to fetch list of songs', e)
+      console.error('failed to edit song', e)
     }
     await navigateTo(`/song/${song.value.id}`)
   }
 
   const deleteSong = async () => {
     // not implemented yet
-    //await db.remove(song.value._id, song.value._rev)
+    try {
+      //  fetch the list from the API
+      console.log('API', '/del', `${apiHome}/api/del`)
+      const r = await useFetch(`${apiHome}/api/del`, {
+        method: 'post',
+        headers: {
+          'content-type': 'application/json',
+          apikey: auth.value.apiKey
+        },
+        body: JSON.stringify(song.value)
+      })
+      console.log('Response', r.data.value)
+    } catch (e) {
+      console.error('failed to delete song', e)
+    }
     await navigateTo('/')
   }
   

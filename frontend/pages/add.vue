@@ -1,5 +1,5 @@
 <script setup>
-  const db = new PouchDB('transposer')
+  const auth = useAuth()
   const song = ref(0)
   song.value = {
     song: '',
@@ -7,9 +7,29 @@
     tab: ''
   }
 
+  // config
+  const config = useRuntimeConfig()
+  const apiHome = config.public['apiBase'] || window.location.origin
+
   const save = async () => {
-    const response = await db.post(song.value)
-    await navigateTo(`/song/${response.id}`)
+    let id
+    try {
+      //  fetch the list from the API
+      console.log('API', '/add', `${apiHome}/api/add`)
+      console.log('Saving song', song.value)
+      const r = await useFetch(`${apiHome}/api/add`, {
+        method: 'post',
+        headers: {
+          'content-type': 'application/json',
+          apikey: auth.value.apiKey
+        },
+        body: JSON.stringify(song.value)
+      })
+      id = r.data.value.id
+    } catch (e) {
+      console.error('failed to edit song', e)
+    }
+    await navigateTo(`/song/${id}`)
   }
   
 </script>
