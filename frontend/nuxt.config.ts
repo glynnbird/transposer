@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiBase: 'https://transposer2.glynnbird.com'
+      apiBase: 'https://transposer.glynnbird.com'
     }
   },
   ssr: false,
