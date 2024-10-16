@@ -80,6 +80,9 @@
     }
     // return the song list filtered to match the contents of the search box
     return songsList.value.filter((s) => {
+      if (!s.artist || !s.song) {
+        return false
+      }
       if (s.artist.toLowerCase().includes(lc) || s.song.toLowerCase().includes(lc)) {
         return true
       }

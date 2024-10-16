@@ -1,5 +1,6 @@
 <script setup>
   const auth = useAuth()
+  const songsList = useSongsList()
   const song = ref(0)
   song.value = {
     song: '',
@@ -26,6 +27,8 @@
         body: JSON.stringify(song.value)
       })
       id = r.data.value.id
+      song.value.id = id
+      songsList.value.push(song.value)
     } catch (e) {
       console.error('failed to edit song', e)
     }

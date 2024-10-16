@@ -1,6 +1,7 @@
 <script setup>
   const route = useRoute()
   const auth = useAuth()
+  const songsList = useSongsList()
   const song = ref(0)
   const id = route.params.id
 
@@ -57,7 +58,17 @@
         body: JSON.stringify(song.value)
       })
       console.log('Response', r.data.value)
-      localStorage.removeItem(song.id)
+      localStorage.removeItem(song.value.id)
+
+      // remove it from the songsList
+      // locate the song in the songsList
+      for(let i = 0; i < songsList.value.length; i++) {
+        const s = songsList.value[i]
+        if (s.id === song.value.id) {
+          songsList.value.splice(i, 1)
+          break
+        }
+      }
     } catch (e) {
       console.error('failed to delete song', e)
     }
