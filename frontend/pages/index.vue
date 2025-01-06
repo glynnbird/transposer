@@ -14,13 +14,11 @@
   const shuffleList = useShuffleList()
 
   // page items
-  const search = ref(1)
-  search.value = ''
+  const search = ref('')
   if (window.location.hash) {
     search.value = decodeURIComponent(window.location.hash.replace('#', ''))
   }
-  const syncing = ref(2)
-  syncing.value = false
+  const syncing = ref(false)
 
   // sort by artist
   const sortFn = function (a, b) {

@@ -1,12 +1,11 @@
 <script setup>
   const auth = useAuth()
   const songsList = useSongsList()
-  const song = ref(0)
-  song.value = {
+  const song = ref({
     song: '',
     artist: '',
     tab: ''
-  }
+  })
 
   // config
   const config = useRuntimeConfig()

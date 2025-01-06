@@ -2,14 +2,10 @@
   const route = useRoute()
   const auth = useAuth()
   const songsList = useSongsList()
-  const song = ref(0)
-  song.value = {}
-  const transpose = ref(1)
-  transpose.value = 6
-  const transpositionAvailable = ref(3)
-  transpositionAvailable.value = false
-  const syncing = ref(4)
-  syncing.value = false
+  const song = ref({})
+  const transpose = ref(6)
+  const transpositionAvailable = ref(false)
+  const syncing = ref(false)
 
   // config
   const config = useRuntimeConfig()

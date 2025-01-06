@@ -2,7 +2,7 @@
   const route = useRoute()
   const auth = useAuth()
   const songsList = useSongsList()
-  const song = ref(0)
+  const song = ref({})
   const id = route.params.id
 
   // config

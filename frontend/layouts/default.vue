@@ -6,8 +6,7 @@
   let pick = 0
 
   // local page items
-  const drawer = ref(0)
-  drawer.value = false
+  const drawer = ref(false)
 
   // click the home link
   const clickHome = async () => {
