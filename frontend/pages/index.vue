@@ -1,4 +1,6 @@
 <script setup>
+  const { $pwa } = useNuxtApp()
+
   // constants
   const SONG_CACHE_KEY = 'songcache'
 
@@ -105,7 +107,11 @@
 
   }
 </script>
-<template>  
+<template>
+  <v-alert color="warning" v-show="$pwa.needRefresh">
+    <h4> New content available, click on reload button to update. </h4>
+    <v-btn @click="$pwa.updateServiceWorker()">Reload</v-btn>
+  </v-alert>  
   <v-progress-linear v-if="syncing" color="yellow-darken-2" indeterminate ></v-progress-linear>
   <v-text-field clearable :label="'Search (' + songs.length + ')'" v-model="search"></v-text-field>
   <v-card v-for="song in songs" variant="text" :ripple="false">
