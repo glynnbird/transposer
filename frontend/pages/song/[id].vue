@@ -5,7 +5,7 @@
   const song = ref({})
   const transpose = ref(6)
   const transpositionAvailable = ref(false)
-  const syncing = ref(false)
+  const busy = ref(false)
 
   // config
   const config = useRuntimeConfig()
@@ -137,22 +137,22 @@
     // 3. Or we fail to parse the cached song
     if (reload) {
       //  fetch the list from the API
-      syncing.value = true
-      console.log('API', '/get', `${apiHome}/api/get`)
-      const r = await useFetch(`${apiHome}/api/get`, {
-        method: 'post',
-        headers: {
-          'content-type': 'application/json',
-          apikey: auth.value.apiKey
-        },
-        body: JSON.stringify({ id })
-      })
-      song.value = r.data.value.doc
-      localStorage.setItem(id, JSON.stringify(song.value))
-      syncing.value = false
+      busy.value = true
+      setTimeout(async () => {
+        console.log('API', '/get', `${apiHome}/api/get`)
+        const r = await useFetch(`${apiHome}/api/get`, {
+          method: 'post',
+          headers: {
+            'content-type': 'application/json',
+            apikey: auth.value.apiKey
+          },
+          body: JSON.stringify({ id })
+        })
+        song.value = r.data.value.doc
+        localStorage.setItem(id, JSON.stringify(song.value))
+        busy.value = false
+      }, 1)
     }
-
-
   } catch (e) {
     console.error('failed to fetch list of songs', e)
   }
@@ -176,7 +176,7 @@ a:link, a:visited, a:hover {
 }
 </style>
 <template>
-  <v-progress-linear v-if="syncing" color="yellow-darken-2" indeterminate ></v-progress-linear>
+  <v-progress-linear v-if="busy" indeterminate></v-progress-linear>
   <h3 v-if="song.id">{{ song.song }} - <NuxtLink :to="'/#' + encodeURIComponent(song.artist)">{{ song.artist }}</NuxtLink> <v-btn @click="edit" variant="plain" density="compact" icon="mdi-pencil"></v-btn></h3>
   <v-slider v-if="song.id && transpositionAvailable" show-ticks="always" step="1" max="12" tick-size="6" v-model="transpose"></v-slider>
   <div v-if="song.id" class="newspaper output lyrics" v-html="transposedTab"></div>

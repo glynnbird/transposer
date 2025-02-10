@@ -29,7 +29,7 @@
       </template>
       <v-app-bar-title @click="clickHome()" style="user-select:none;">Transposer</v-app-bar-title>
       <template v-slot:append v-if="shuffleList.length > 0">
-        <v-btn v-if="shuffleList.length > 0" icon="mdi-shuffle" @click="shuffle"></v-btn>
+        <v-btn icon="mdi-shuffle" @click="shuffle"></v-btn>
       </template>
     </v-app-bar>
     <v-navigation-drawer v-model="drawer" location="left">
