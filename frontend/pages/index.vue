@@ -43,7 +43,6 @@
 
   // fetch all songs from Cloudflare
   const loadSongs = async () => {
-    const songIds = []
     try {
       //  fetch the list from the API
       console.log('API', '/list', `${apiHome}/api/list`)
@@ -56,7 +55,6 @@
         }
       })
       songsList.value = r.data.value.list.map((r) => {
-        songIds.push(r.id)
         return r
       })
       localStorage.setItem(SONG_CACHE_KEY, JSON.stringify(songsList.value))
@@ -64,7 +62,7 @@
     } catch (e) {
       console.error('failed to fetch list of songs', e)
     }
-    shuffleList.value = shuffleArray(songIds)
+    shuffleList.value = shuffleArray(JSON.parse(JSON.stringify(songsList.value)))
   }
 
   // whenever the searchbox changes
@@ -73,11 +71,17 @@
     if (!sv) {
       sv = ''
     }
-    const lc = sv.toLowerCase()
+    const lc = sv.toLowerCase().trim()
     // update the browser # url if needed
     if (lc !== window.location.hash) {
       window.location.hash = lc
     }
+    
+    // if there's no filter, return the shuffle list
+    if (!sv) {
+      return shuffleList.value
+    }
+
     // return the song list filtered to match the contents of the search box
     return songsList.value.filter((s) => {
       if (!s.artist || !s.song) {
@@ -97,6 +101,7 @@
     if (v) {
       console.log('restoring songs from cache')
       songsList.value = JSON.parse(v)
+      shuffleList.value = songsList.value
     }
     
     // in the background

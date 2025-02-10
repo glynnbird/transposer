@@ -15,10 +15,10 @@
   }
 
   const shuffle = async () => {
-    const id = shuffleList.value[pick]
+    const id = shuffleList.value[pick].id
     pick++
     pick = pick % shuffleList.value.length
-    await navigateTo(`/song/${shuffleList.value[pick]}`)
+    await navigateTo(`/song/${id}`)
   }
 </script>
 <template>   
