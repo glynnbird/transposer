@@ -22,11 +22,13 @@
   }
   const syncing = ref(false)
 
-  // sort by artist
+  // sort by artist/song
   const sortFn = function (a, b) {
-    if (a.artist < b.artist) {
+    const A = a.artist + a.song
+    const B = b.artist + b.song
+    if (A < B) {
       return -1
-    } else if (a.artist > b.artist) {
+    } else if (A > B) {
       return 1
     }
     return 0
