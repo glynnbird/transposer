@@ -1,15 +1,9 @@
-import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
+import vuetify from 'vite-plugin-vuetify'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   build: {
     transpile: ['vuetify'],
   },
-  runtimeConfig: {
-    public: {
-      apiBase: 'https://transposer.glynnbird.com'
-    }
-  },
-  ssr: false,
   modules: [
     '@vite-pwa/nuxt',
     (_options, nuxt) => {
@@ -20,15 +14,8 @@ export default defineNuxtConfig({
     },
     //...
   ],
-  compatibilityDate: '2024-04-03',
-  devtools: { enabled: true },
-  vite: {
-    vue: {
-      template: {
-        transformAssetUrls,
-      },
-    },
-  },
+  ssr: false,
+
   pwa: {
     strategies: 'generateSW',
     client: {
@@ -53,6 +40,18 @@ export default defineNuxtConfig({
       "theme_color": "#9C27B0",
       "background_color": "#FFFFFF",
       "display": "standalone"
+    }
+  },
+  runtimeConfig: {
+    public: {
+      apiBase: 'https://transposer.glynnbird.com'
+    }
+  },
+  compatibilityDate: '2024-09-24',
+  devtools: { enabled: true },
+  vite: {
+    define: {
+      'process.env.DEBUG': false,
     }
   }
 })
