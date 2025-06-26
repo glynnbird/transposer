@@ -44,7 +44,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiBase: 'https://transposer.glynnbird.com'
+      apiBase: ''
     }
   },
   compatibilityDate: '2024-09-24',
