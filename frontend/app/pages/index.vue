@@ -47,16 +47,16 @@
   const loadSongs = async () => {
     try {
       //  fetch the list from the API
-      console.log('API', '/list', `${apiHome}/api/list`)
+      console.log('API', '/list', `${apiHome}/api/list`, auth.value.apiKey)
       syncing.value = true
-      const r = await useFetch(`${apiHome}/api/list`, {
+      const r = await $fetch(`${apiHome}/api/list`, {
         method: 'post',
         headers: {
           'content-type': 'application/json',
           apikey: auth.value.apiKey
         }
       })
-      songsList.value = r.data.value.list.map((r) => {
+      songsList.value = r.list.map((r) => {
         return r
       })
       localStorage.setItem(SONG_CACHE_KEY, JSON.stringify(songsList.value))

@@ -20,9 +20,15 @@ resource "cloudflare_pages_project" "frontend_project" {
   }
     deployment_configs = {
       preview = {
-        environment_variables = {
-          NODE_VERSION = "22"
-          API_KEY = random_string.apiKey.id
+        env_vars = {
+          NODE_VERSION =  {
+            type = "plain_text"
+            value = "22"
+          }
+          API_KEY = {
+            type = "plain_text"
+            value = random_string.apiKey.id
+          }
         }
 
         kv_namespaces = {
@@ -32,9 +38,15 @@ resource "cloudflare_pages_project" "frontend_project" {
         }
       }
       production = {
-        environment_variables = {
-          NODE_VERSION = "22"
-          API_KEY = random_string.apiKey.id
+        env_vars = {
+          NODE_VERSION =  {
+            type = "plain_text"
+            value = "22"
+          }
+          API_KEY = {
+            type = "plain_text"
+            value = random_string.apiKey.id
+          }
         }
 
         kv_namespaces = {

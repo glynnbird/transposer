@@ -17,7 +17,7 @@
       //  fetch the list from the API
       console.log('API', '/add', `${apiHome}/api/add`)
       console.log('Saving song', song.value)
-      const r = await useFetch(`${apiHome}/api/add`, {
+      const r = await $fetch(`${apiHome}/api/add`, {
         method: 'post',
         headers: {
           'content-type': 'application/json',
@@ -25,7 +25,7 @@
         },
         body: JSON.stringify(song.value)
       })
-      id = r.data.value.id
+      id = r.id
       song.value.id = id
       songsList.value.push(song.value)
     } catch (e) {

@@ -140,7 +140,7 @@
       busy.value = true
       setTimeout(async () => {
         console.log('API', '/get', `${apiHome}/api/get`)
-        const r = await useFetch(`${apiHome}/api/get`, {
+        const r = await $fetch(`${apiHome}/api/get`, {
           method: 'post',
           headers: {
             'content-type': 'application/json',
@@ -148,7 +148,7 @@
           },
           body: JSON.stringify({ id })
         })
-        song.value = r.data.value.doc
+        song.value = r.doc
         localStorage.setItem(id, JSON.stringify(song.value))
         busy.value = false
       }, 1)

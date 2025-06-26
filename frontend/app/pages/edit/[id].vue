@@ -12,7 +12,7 @@
   try {
     //  fetch the list from the API
     console.log('API', '/get', `${apiHome}/api/get`)
-    const r = await useFetch(`${apiHome}/api/get`, {
+    const r = await $fetch(`${apiHome}/api/get`, {
       method: 'post',
       headers: {
         'content-type': 'application/json',
@@ -20,7 +20,7 @@
       },
       body: JSON.stringify({ id })
     })
-    song.value = r.data.value.doc
+    song.value = r.doc
   } catch (e) {
     console.error('failed to fetch list of songs', e)
   }
@@ -29,7 +29,7 @@
     try {
       //  fetch the list from the API
       console.log('API', '/add', `${apiHome}/api/add`)
-      const r = await useFetch(`${apiHome}/api/add`, {
+      const r = await $fetch(`${apiHome}/api/add`, {
         method: 'post',
         headers: {
           'content-type': 'application/json',
@@ -49,7 +49,7 @@
     try {
       //  fetch the list from the API
       console.log('API', '/del', `${apiHome}/api/del`)
-      const r = await useFetch(`${apiHome}/api/del`, {
+      const r = await $fetch(`${apiHome}/api/del`, {
         method: 'post',
         headers: {
           'content-type': 'application/json',
@@ -57,7 +57,7 @@
         },
         body: JSON.stringify(song.value)
       })
-      console.log('Response', r.data.value)
+      console.log('Response', r)
       localStorage.removeItem(song.value.id)
 
       // remove it from the songsList
