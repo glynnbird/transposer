@@ -1,77 +1,20 @@
 <script setup>
   const route = useRoute()
-  const auth = useAuth()
-  const songsList = useSongsList()
+  const { addSong, loadSong, deleteSong } = useSongsList()
   const song = ref({})
   const id = route.params.id
 
-  // config
-  const config = useRuntimeConfig()
-  const apiHome = config.public['apiBase'] || window.location.origin
+  // load the song
+  song.value = await loadSong(id)
 
-  try {
-    //  fetch the list from the API
-    console.log('API', '/get', `${apiHome}/api/get`)
-    const r = await $fetch(`${apiHome}/api/get`, {
-      method: 'post',
-      headers: {
-        'content-type': 'application/json',
-        apikey: auth.value.apiKey
-      },
-      body: JSON.stringify({ id })
-    })
-    song.value = r.doc
-  } catch (e) {
-    console.error('failed to fetch list of songs', e)
-  }
-
+  // save the edited song
   const save = async () => {
-    try {
-      //  fetch the list from the API
-      console.log('API', '/add', `${apiHome}/api/add`)
-      const r = await $fetch(`${apiHome}/api/add`, {
-        method: 'post',
-        headers: {
-          'content-type': 'application/json',
-          apikey: auth.value.apiKey
-        },
-        body: JSON.stringify(song.value)
-      })
-      localStorage.removeItem(song.id)
-    } catch (e) {
-      console.error('failed to edit song', e)
-    }
-    await navigateTo(`/song/${song.value.id}`)
+    const id = await addSong(song.value)
+    await navigateTo(`/song/${id}`)
   }
 
-  const deleteSong = async () => {
-    // not implemented yet
-    try {
-      //  fetch the list from the API
-      console.log('API', '/del', `${apiHome}/api/del`)
-      const r = await $fetch(`${apiHome}/api/del`, {
-        method: 'post',
-        headers: {
-          'content-type': 'application/json',
-          apikey: auth.value.apiKey
-        },
-        body: JSON.stringify(song.value)
-      })
-      console.log('Response', r)
-      localStorage.removeItem(song.value.id)
-
-      // remove it from the songsList
-      // locate the song in the songsList
-      for(let i = 0; i < songsList.value.length; i++) {
-        const s = songsList.value[i]
-        if (s.id === song.value.id) {
-          songsList.value.splice(i, 1)
-          break
-        }
-      }
-    } catch (e) {
-      console.error('failed to delete song', e)
-    }
+  const del = async () => {
+    await deleteSong(song.value)
     await navigateTo('/')
   }
   
@@ -90,6 +33,5 @@ textarea {
   <v-textarea label="Tab" v-model="song.tab"></v-textarea>
   <v-btn :disabled="!song.artist || !song.song" color="success" @click="save">Edit Tab</v-btn>
   <br /><br />
-
-  <v-btn color="error" @click="deleteSong">Delete</v-btn>
+  <v-btn color="error" @click="del">Delete</v-btn>
 </template>

@@ -1,15 +1,11 @@
 <script setup>
   const route = useRoute()
-  const auth = useAuth()
-  const songsList = useSongsList()
+  const { loadSong } = useSongsList()
+
   const song = ref({})
   const transpose = ref(6)
   const transpositionAvailable = ref(false)
   const busy = ref(false)
-
-  // config
-  const config = useRuntimeConfig()
-  const apiHome = config.public['apiBase'] || window.location.origin
 
   // transposition constants
   const TAB_LINE_REGEXP = new RegExp('^[ABCDEFGmbmajsusdim#976542/ ]+$')
@@ -98,64 +94,8 @@
   }
 
   const id = route.params.id
-  try {
-
-    // load songs from cache
-    const v = localStorage.getItem(id)
-    let reload = false
-    if (v) {
-      try {
-        song.value = JSON.parse(v)
-        // locate the song in the songsList
-        let found = false
-        for(let i = 0; i < songsList.value.length; i++) {
-          const s = songsList.value[i]
-          if (s.id === id) {
-            // if our cached hash is different from the songsList
-            // we need to reload it from Cloudflare KV
-            if (song.value.hash !== s.hash) {
-              reload = true
-            }
-            found = true
-            break
-          }
-        }
-        if (!found) {
-          reload = true
-        }
-      } catch {
-        // oops
-        reload = true
-      }
-    } else {
-      reload = true
-    }
-
-    // we need to reload if:
-    // 1. There is no cached copy
-    // 2. Or the hash in the songList is different from the cached hash
-    // 3. Or we fail to parse the cached song
-    if (reload) {
-      //  fetch the list from the API
-      busy.value = true
-      setTimeout(async () => {
-        console.log('API', '/get', `${apiHome}/api/get`)
-        const r = await $fetch(`${apiHome}/api/get`, {
-          method: 'post',
-          headers: {
-            'content-type': 'application/json',
-            apikey: auth.value.apiKey
-          },
-          body: JSON.stringify({ id })
-        })
-        song.value = r.doc
-        localStorage.setItem(id, JSON.stringify(song.value))
-        busy.value = false
-      }, 1)
-    }
-  } catch (e) {
-    console.error('failed to fetch list of songs', e)
-  }
+  song.value = await loadSong(id)
+  
 </script>
 <style setup>
 .output {

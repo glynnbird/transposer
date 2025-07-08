@@ -1,7 +1,7 @@
 <script setup>
   // state
-  const shuffleList = useShuffleList()
-  const auth = useAuth()
+  const { shuffleList } = useSongsList()
+  const { isLoggedIn } = useAuth()
 
   let pick = 0
 
@@ -34,10 +34,10 @@
     </v-app-bar>
     <v-navigation-drawer v-model="drawer" location="left">
       <v-list>
-        <v-list-item v-if="auth.authenticated" prepend-icon="mdi-home" title="Home" @click="clickHome()"></v-list-item>
-        <v-list-item v-if="auth.authenticated" prepend-icon="mdi-plus" title="Add" @click="navigateTo('/add')"></v-list-item>
-        <v-list-item v-if="auth.authenticated" prepend-icon="mdi-logout" title="Logout" @click="navigateTo('/logout')"></v-list-item>
-        <v-list-item v-if="!auth.authenticated" prepend-icon="mdi-login" title="Login" @click="navigateTo('/login')"></v-list-item>
+        <v-list-item v-if="isLoggedIn()" prepend-icon="mdi-home" title="Home" @click="clickHome()"></v-list-item>
+        <v-list-item v-if="isLoggedIn()" prepend-icon="mdi-plus" title="Add" @click="navigateTo('/add')"></v-list-item>
+        <v-list-item v-if="isLoggedIn()" prepend-icon="mdi-logout" title="Logout" @click="navigateTo('/logout')"></v-list-item>
+        <v-list-item v-if="!isLoggedIn()" prepend-icon="mdi-login" title="Login" @click="navigateTo('/login')"></v-list-item>
       </v-list>
     </v-navigation-drawer>
     <v-main>

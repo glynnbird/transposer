@@ -1,36 +1,14 @@
 <script setup>
-  const auth = useAuth()
-  const songsList = useSongsList()
+  const { addSong } = useSongsList()
+  
   const song = ref({
     song: '',
     artist: '',
     tab: ''
   })
 
-  // config
-  const config = useRuntimeConfig()
-  const apiHome = config.public['apiBase'] || window.location.origin
-
   const save = async () => {
-    let id
-    try {
-      //  fetch the list from the API
-      console.log('API', '/add', `${apiHome}/api/add`)
-      console.log('Saving song', song.value)
-      const r = await $fetch(`${apiHome}/api/add`, {
-        method: 'post',
-        headers: {
-          'content-type': 'application/json',
-          apikey: auth.value.apiKey
-        },
-        body: JSON.stringify(song.value)
-      })
-      id = r.id
-      song.value.id = id
-      songsList.value.push(song.value)
-    } catch (e) {
-      console.error('failed to edit song', e)
-    }
+    const id = await addSong(song.value)
     await navigateTo(`/song/${id}`)
   }
   
