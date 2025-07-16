@@ -15,3 +15,6 @@ cd code
 npm install
 ./build.sh
 cd ..
+
+# build info
+npx nuxt info
