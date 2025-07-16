@@ -7,6 +7,9 @@ rm package-lock.json
 npm install
 npm run generate
 mv dist ../
+
+## output nuxt build information
+npx nuxt info
 cd ..
 
 # build functions
@@ -16,5 +19,4 @@ npm install
 ./build.sh
 cd ..
 
-# build info
-npx nuxt info
+
