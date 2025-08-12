@@ -37,8 +37,8 @@
     }
     
     // if there's no filter, return the shuffle list
-    if (!sv && shuffleList) {
-      return shuffleList.value
+    if (!sv) {
+      return songsList.value.sort(sortFn)
     }
 
     // return the song list filtered to match the contents of the search box
