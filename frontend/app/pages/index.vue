@@ -64,19 +64,22 @@
     <v-btn color="primary" @click="$pwa.updateServiceWorker()">Reload</v-btn>
   </v-alert>  
   <v-progress-linear v-if="syncing" color="yellow-darken-2" indeterminate ></v-progress-linear>
-  <v-text-field clearable :label="'Search (' + songs.length + ')'" v-model="search"></v-text-field>
+
   <v-row>
     <v-col>
+      <v-text-field clearable :label="'Search (' + songs.length + ')'" v-model="search"></v-text-field>
       <v-card v-for="song in songs" variant="text" :ripple="false" :key="song.id">
         <v-card-title @click="navigateTo('/song/' + song.id)">{{ song.song }}</v-card-title>
         <v-card-subtitle>{{ song.artist }}</v-card-subtitle>
       </v-card>
     </v-col>
     <v-col>
-      <v-card v-for="song in shuffleList.slice(shufflePick)" color="green" variant="text" :ripple="false" :key="`shuffle${song.id}`">
-        <v-card-title @click="navigateTo('/song/' + song.id)">{{ song.song }}</v-card-title>
-        <v-card-subtitle>{{ song.artist }}</v-card-subtitle>
-      </v-card>
+      <v-sheet color="green-lighten-3" style="padding:10px">
+        <v-card v-for="song in shuffleList.slice(shufflePick)" variant="text" color="grey-darken-2" :ripple="false" :key="`shuffle${song.id}`">
+          <v-card-title @click="navigateTo('/song/' + song.id)">{{ song.song }}</v-card-title>
+          <v-card-subtitle>{{ song.artist }}</v-card-subtitle>
+        </v-card>
+      </v-sheet>
     </v-col>
   </v-row>
 </template>
