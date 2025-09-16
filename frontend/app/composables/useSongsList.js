@@ -5,6 +5,7 @@ export default function () {
   const songsList = useState('songsList', () => [])
   const shuffleList = useState('shuffleList', () => [])
   const stick = useState('stick', () => { return false })
+  const shufflePick = useState('shufflePick', () => 0)
   const { auth } = useAuth()
   const config = useRuntimeConfig()
   const apiHome = config.public['apiBase'] || window.location.origin
@@ -195,5 +196,9 @@ export default function () {
     }, 1)
   }
 
-  return { songsList, shuffleList, loadSong, addSong, deleteSong }
+  function incShufflePick() {
+    shufflePick.value = ++shufflePick.value % shuffleList.value.length
+  }
+
+  return { songsList, shuffleList, loadSong, addSong, deleteSong, shufflePick, incShufflePick }
 }

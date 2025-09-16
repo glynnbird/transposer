@@ -3,7 +3,7 @@
 
 
   //state
-  const { songsList, shuffleList } = useSongsList()
+  const { songsList, shuffleList, shufflePick } = useSongsList()
 
   // page items
   const search = ref('')
@@ -65,8 +65,18 @@
   </v-alert>  
   <v-progress-linear v-if="syncing" color="yellow-darken-2" indeterminate ></v-progress-linear>
   <v-text-field clearable :label="'Search (' + songs.length + ')'" v-model="search"></v-text-field>
-  <v-card v-for="song in songs" variant="text" :ripple="false">
-    <v-card-title @click="navigateTo('/song/' + song.id)">{{ song.song }}</v-card-title>
-    <v-card-subtitle>{{ song.artist }}</v-card-subtitle>
-  </v-card>
+  <v-row>
+    <v-col>
+      <v-card v-for="song in songs" variant="text" :ripple="false" :key="song.id">
+        <v-card-title @click="navigateTo('/song/' + song.id)">{{ song.song }}</v-card-title>
+        <v-card-subtitle>{{ song.artist }}</v-card-subtitle>
+      </v-card>
+    </v-col>
+    <v-col>
+      <v-card v-for="song in shuffleList.slice(shufflePick)" color="green" variant="text" :ripple="false" :key="`shuffle${song.id}`">
+        <v-card-title @click="navigateTo('/song/' + song.id)">{{ song.song }}</v-card-title>
+        <v-card-subtitle>{{ song.artist }}</v-card-subtitle>
+      </v-card>
+    </v-col>
+  </v-row>
 </template>

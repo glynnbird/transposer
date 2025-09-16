@@ -1,9 +1,7 @@
 <script setup>
   // state
-  const { shuffleList } = useSongsList()
+  const { shuffleList, shufflePick, incShufflePick } = useSongsList()
   const { isLoggedIn } = useAuth()
-
-  let pick = 0
 
   // local page items
   const drawer = ref(false)
@@ -15,9 +13,8 @@
   }
 
   const shuffle = async () => {
-    const id = shuffleList.value[pick].id
-    pick++
-    pick = pick % shuffleList.value.length
+    const id = shuffleList.value[shufflePick.value].id
+    incShufflePick()
     await navigateTo(`/song/${id}`)
   }
 </script>
